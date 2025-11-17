@@ -17,15 +17,20 @@
 package epoch
 
 import (
+	"fmt"
 	"os"
+<<<<<<< HEAD
 	"runtime"
 	"strconv"
+=======
+>>>>>>> v2.0.7
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 )
 
+<<<<<<< HEAD
 func rightAfter(t1, t2 time.Time) bool {
 	if t2.Equal(t1) {
 		return true
@@ -38,6 +43,8 @@ func rightAfter(t1, t2 time.Time) bool {
 	return t2.After(t1) && t2.Before(t1.Add(threshold))
 }
 
+=======
+>>>>>>> v2.0.7
 func TestSourceDateEpoch(t *testing.T) {
 	if s, ok := os.LookupEnv(SourceDateEpochEnv); ok {
 		t.Logf("%s is already set to %q, unsetting", SourceDateEpochEnv, s)
@@ -50,10 +57,13 @@ func TestSourceDateEpoch(t *testing.T) {
 		vp, err := SourceDateEpoch()
 		require.NoError(t, err)
 		require.Nil(t, vp)
+<<<<<<< HEAD
 
 		now := time.Now().UTC()
 		v := SourceDateEpochOrNow()
 		require.True(t, rightAfter(now, v), "now: %s, v: %s", now, v)
+=======
+>>>>>>> v2.0.7
 	})
 
 	t.Run("WithEmptySourceDateEpoch", func(t *testing.T) {
@@ -67,10 +77,13 @@ func TestSourceDateEpoch(t *testing.T) {
 		vp, err = ParseSourceDateEpoch(emptyValue)
 		require.Error(t, err, "value is empty")
 		require.Nil(t, vp)
+<<<<<<< HEAD
 
 		now := time.Now().UTC()
 		v := SourceDateEpochOrNow()
 		require.True(t, rightAfter(now, v), "now: %s, v: %s", now, v)
+=======
+>>>>>>> v2.0.7
 	})
 
 	t.Run("WithSourceDateEpoch", func(t *testing.T) {
@@ -84,13 +97,17 @@ func TestSourceDateEpoch(t *testing.T) {
 		vp, err := SourceDateEpoch()
 		require.NoError(t, err)
 		require.True(t, vp.Equal(sourceDateEpoch.UTC()))
+<<<<<<< HEAD
 
 		vp, err = ParseSourceDateEpoch(strconv.Itoa(int(sourceDateEpoch.Unix())))
 		require.NoError(t, err)
 		require.True(t, vp.Equal(sourceDateEpoch))
+=======
+>>>>>>> v2.0.7
 
-		v := SourceDateEpochOrNow()
-		require.True(t, v.Equal(sourceDateEpoch))
+		vp, err = ParseSourceDateEpoch(fmt.Sprintf("%d", sourceDateEpoch.Unix()))
+		require.NoError(t, err)
+		require.True(t, vp.Equal(sourceDateEpoch))
 	})
 
 	t.Run("WithInvalidSourceDateEpoch", func(t *testing.T) {
@@ -104,9 +121,12 @@ func TestSourceDateEpoch(t *testing.T) {
 		vp, err = ParseSourceDateEpoch(invalidValue)
 		require.ErrorContains(t, err, "invalid value:")
 		require.Nil(t, vp)
+<<<<<<< HEAD
 
 		now := time.Now().UTC()
 		v := SourceDateEpochOrNow()
 		require.True(t, rightAfter(now, v), "now: %s, v: %s", now, v)
+=======
+>>>>>>> v2.0.7
 	})
 }

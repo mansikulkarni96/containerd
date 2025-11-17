@@ -31,8 +31,13 @@ import (
 	"time"
 
 	fuzz "github.com/AdaLogics/go-fuzz-headers"
+<<<<<<< HEAD
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/oci"
+=======
+	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/pkg/oci"
+>>>>>>> v2.0.7
 )
 
 var (

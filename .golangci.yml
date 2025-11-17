@@ -13,7 +13,7 @@ linters:
     - tenv # Detects using os.Setenv instead of t.Setenv since Go 1.17
     - unconvert
     - unused
-    - vet
+    - govet
     - dupword # Checks for duplicate words in the source code
   disable:
     - errcheck
@@ -27,11 +27,17 @@ issues:
   exclude-dirs:
     - api
     - cluster
+<<<<<<< HEAD
     - design
     - docs
     - docs/man
     - releases
     - reports
+=======
+    - docs
+    - docs/man
+    - releases
+>>>>>>> v2.0.7
     - test # e2e scripts
 
   # Only using / doesn't work due to https://github.com/golangci/golangci-lint/issues/1398.
@@ -43,6 +49,11 @@ issues:
     - path: 'archive[\\/]tarheader[\\/]'
       # conversion is necessary on Linux, unnecessary on macOS
       text: "unnecessary conversion"
+<<<<<<< HEAD
+=======
+    - path: 'integration[\\/]client'
+      text: "dot-imports:"
+>>>>>>> v2.0.7
     - linters:
         - revive
       text: "if-return"
@@ -61,6 +72,7 @@ issues:
     - linters:
         - revive
       text: "redefines-builtin-id"
+<<<<<<< HEAD
 
     # FIXME temporarily suppress deprecation warnings for the logs package. See https://github.com/containerd/containerd/pull/9086
     - text: "SA1019: log\\.(G|L|Fields|Entry|RFC3339NanoFixed|Level|TraceLevel|DebugLevel|InfoLevel|WarnLevel|ErrorLevel|FatalLevel|PanicLevel|SetLevel|GetLevel|OutputFormat|TextFormat|JSONFormat|SetFormat|WithLogger|GetLogger)"
@@ -70,16 +82,24 @@ issues:
       linters:
         - staticcheck
 
+=======
+>>>>>>> v2.0.7
 
 linters-settings:
   depguard:
     rules:
       main:
         deny:
+<<<<<<< HEAD
           - pkg: "github.com/containerd/containerd/log"
             desc: The containerd log package was migrated to a separate module. Use github.com/containerd/log instead.
           - pkg: "github.com/containerd/containerd/platforms"
             desc: The containerd platforms package was migrated to a separate module. Use github.com/containerd/platforms instead.
+=======
+          - pkg: github.com/opencontainers/runc
+            desc: We don't want to depend on runc (libcontainer), unless there is no other option; see https://github.com/opencontainers/runc/issues/3028.
+
+>>>>>>> v2.0.7
   gosec:
     # The following issues surfaced when `gosec` linter
     # was enabled. They are temporarily excluded to unblock
@@ -92,6 +112,11 @@ linters-settings:
       - G402
       - G404
       - G115
+<<<<<<< HEAD
+=======
+  nolintlint:
+    allow-unused: true
+>>>>>>> v2.0.7
 
 run:
   timeout: 8m

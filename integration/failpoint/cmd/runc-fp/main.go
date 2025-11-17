@@ -27,7 +27,11 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+<<<<<<< HEAD
 	"github.com/containerd/containerd/oci"
+=======
+	"github.com/containerd/containerd/v2/pkg/oci"
+>>>>>>> v2.0.7
 )
 
 const (

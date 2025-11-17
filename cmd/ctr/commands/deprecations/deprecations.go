@@ -22,6 +22,7 @@ import (
 	"text/tabwriter"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/urfave/cli"
 
 	api "github.com/containerd/containerd/api/services/introspection/v1"
@@ -42,27 +43,64 @@ var listCommand = cli.Command{
 	Usage: "Print warnings for deprecations",
 	Flags: []cli.Flag{
 		cli.StringFlag{
+=======
+	"github.com/urfave/cli/v2"
+
+	api "github.com/containerd/containerd/api/services/introspection/v1"
+	"github.com/containerd/containerd/v2/cmd/ctr/commands"
+	"github.com/containerd/containerd/v2/pkg/protobuf"
+)
+
+// Command is the parent for all commands under "deprecations"
+var Command = &cli.Command{
+	Name: "deprecations",
+	Subcommands: []*cli.Command{
+		listCommand,
+	},
+}
+var listCommand = &cli.Command{
+	Name:  "list",
+	Usage: "Print warnings for deprecations",
+	Flags: []cli.Flag{
+		&cli.StringFlag{
+>>>>>>> v2.0.7
 			Name:  "format",
 			Usage: "output format to use (Examples: 'default', 'json')",
 		},
 	},
+<<<<<<< HEAD
 	Action: func(context *cli.Context) error {
 		// Suppress automatic warnings, since we print the warnings by ourselves.
 		os.Setenv("CONTAINERD_SUPPRESS_DEPRECATION_WARNINGS", "1")
 
 		client, ctx, cancel, err := commands.NewClient(context)
+=======
+	Action: func(cliContext *cli.Context) error {
+		// Suppress automatic warnings, since we print the warnings by ourselves.
+		os.Setenv("CONTAINERD_SUPPRESS_DEPRECATION_WARNINGS", "1")
+
+		client, ctx, cancel, err := commands.NewClient(cliContext)
+>>>>>>> v2.0.7
 		if err != nil {
 			return err
 		}
 		defer cancel()
 
+<<<<<<< HEAD
 		resp, err := client.IntrospectionService().Server(ctx, &ptypes.Empty{})
+=======
+		resp, err := client.IntrospectionService().Server(ctx)
+>>>>>>> v2.0.7
 		if err != nil {
 			return err
 		}
 		wrn := warnings(resp)
 		if len(wrn) > 0 {
+<<<<<<< HEAD
 			switch context.String("format") {
+=======
+			switch cliContext.String("format") {
+>>>>>>> v2.0.7
 			case "json":
 				commands.PrintAsJSON(warnings(resp))
 				return nil

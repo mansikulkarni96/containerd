@@ -18,12 +18,20 @@ package integration
 
 import (
 	"context"
+<<<<<<< HEAD
 	"strings"
+=======
+>>>>>>> v2.0.7
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
+<<<<<<< HEAD
 	"github.com/containerd/containerd/namespaces"
+=======
+	apitask "github.com/containerd/containerd/api/runtime/task/v3"
+	"github.com/containerd/containerd/v2/pkg/namespaces"
+>>>>>>> v2.0.7
 )
 
 // TestIssue7496_ShouldRetryShutdown is based on https://github.com/containerd/containerd/issues/7496.
@@ -38,6 +46,7 @@ func TestIssue7496_ShouldRetryShutdown(t *testing.T) {
 	// TODO: re-enable if we can retry Shutdown API.
 	t.Skipf("Please re-enable me if we can retry Shutdown API")
 
+<<<<<<< HEAD
 	t.Logf("Checking CRI config's default runtime")
 	criCfg, err := CRIConfig()
 	require.NoError(t, err)
@@ -47,6 +56,8 @@ func TestIssue7496_ShouldRetryShutdown(t *testing.T) {
 		t.Skipf("default runtime should be runc.v2, but it's not: %s", typ)
 	}
 
+=======
+>>>>>>> v2.0.7
 	ctx := namespaces.WithNamespace(context.Background(), "k8s.io")
 
 	t.Logf("Create a pod config with shutdown failpoint")
@@ -60,15 +71,25 @@ func TestIssue7496_ShouldRetryShutdown(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Logf("Connect to the shim %s", sbID)
+<<<<<<< HEAD
 	sCli := newShimCli(ctx, t, sbID, false)
 
 	t.Logf("Log shim %s's pid: %d", sbID, sCli.pid(ctx, t))
+=======
+	shimCli := connectToShim(ctx, t, containerdEndpoint, 3, sbID)
+
+	t.Logf("Log shim %s's pid: %d", sbID, shimPid(ctx, t, shimCli))
+>>>>>>> v2.0.7
 
 	t.Logf("StopPodSandbox and RemovePodSandbox")
 	require.NoError(t, runtimeService.StopPodSandbox(sbID))
 	require.NoError(t, runtimeService.RemovePodSandbox(sbID))
 
 	t.Logf("Check the shim connection")
+<<<<<<< HEAD
 	_, err = sCli.connect(ctx)
+=======
+	_, err = shimCli.Connect(ctx, &apitask.ConnectRequest{})
+>>>>>>> v2.0.7
 	require.Error(t, err, "should failed to call shim connect API")
 }

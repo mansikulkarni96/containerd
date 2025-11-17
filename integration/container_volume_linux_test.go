@@ -23,8 +23,13 @@ import (
 	"testing"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/containerd/containerd/contrib/seccomp/kernelversion"
 	"github.com/containerd/containerd/integration/images"
+=======
+	"github.com/containerd/containerd/v2/integration/images"
+	"github.com/containerd/containerd/v2/pkg/kernelversion"
+>>>>>>> v2.0.7
 	"github.com/stretchr/testify/require"
 	criruntime "k8s.io/cri-api/pkg/apis/runtime/v1"
 )
@@ -44,9 +49,15 @@ func TestRunContainerWithVolatileOption(t *testing.T) {
 	err := os.WriteFile(
 		cfgPath,
 		[]byte(`
+<<<<<<< HEAD
 version = 2
 
 [plugins."io.containerd.grpc.v1.cri"]
+=======
+version = 3
+
+[plugins.'io.containerd.internal.v1.cri']
+>>>>>>> v2.0.7
   ignore_image_defined_volumes = false
 
 [plugins."io.containerd.snapshotter.v1.overlayfs"]
@@ -56,7 +67,11 @@ version = 2
 	require.NoError(t, err)
 
 	t.Logf("Starting containerd")
+<<<<<<< HEAD
 	currentProc := newCtrdProc(t, "containerd", workDir)
+=======
+	currentProc := newCtrdProc(t, "containerd", workDir, nil)
+>>>>>>> v2.0.7
 	require.NoError(t, currentProc.isReady())
 	t.Cleanup(func() {
 		t.Log("Cleanup all the pods")

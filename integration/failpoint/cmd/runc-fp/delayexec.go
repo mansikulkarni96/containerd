@@ -30,8 +30,13 @@ import (
 	"github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/sirupsen/logrus"
 
+<<<<<<< HEAD
 	"github.com/containerd/containerd/integration/failpoint"
 	"github.com/containerd/containerd/pkg/fifosync"
+=======
+	"github.com/containerd/containerd/v2/integration/failpoint"
+	"github.com/containerd/containerd/v2/pkg/fifosync"
+>>>>>>> v2.0.7
 )
 
 // delayExec delays an "exec" command until a trigger is received from the calling test program.  This can be used to

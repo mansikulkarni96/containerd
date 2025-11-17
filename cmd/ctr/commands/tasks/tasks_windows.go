@@ -17,22 +17,29 @@
 package tasks
 
 import (
-	gocontext "context"
+	"context"
 	"errors"
 	"net/url"
 	"time"
 
 	"github.com/containerd/console"
+<<<<<<< HEAD
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/cio"
 	"github.com/containerd/log"
 	"github.com/urfave/cli"
+=======
+	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/pkg/cio"
+	"github.com/containerd/log"
+	"github.com/urfave/cli/v2"
+>>>>>>> v2.0.7
 )
 
 var platformStartFlags = []cli.Flag{}
 
 // HandleConsoleResize resizes the console
-func HandleConsoleResize(ctx gocontext.Context, task resizer, con console.Console) error {
+func HandleConsoleResize(ctx context.Context, task resizer, con console.Console) error {
 	// do an initial resize of the console
 	size, err := con.Size()
 	if err != nil {
@@ -61,7 +68,7 @@ func HandleConsoleResize(ctx gocontext.Context, task resizer, con console.Consol
 }
 
 // NewTask creates a new task
-func NewTask(ctx gocontext.Context, client *containerd.Client, container containerd.Container, _ string, con console.Console, nullIO bool, logURI string, ioOpts []cio.Opt, opts ...containerd.NewTaskOpts) (containerd.Task, error) {
+func NewTask(ctx context.Context, client *containerd.Client, container containerd.Container, _ string, con console.Console, nullIO bool, logURI string, ioOpts []cio.Opt, opts ...containerd.NewTaskOpts) (containerd.Task, error) {
 	var ioCreator cio.Creator
 	if con != nil {
 		if nullIO {

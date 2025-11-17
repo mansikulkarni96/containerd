@@ -21,6 +21,7 @@ import (
 	"errors"
 	"sync"
 
+<<<<<<< HEAD
 	"github.com/containerd/containerd/errdefs"
 	"github.com/containerd/containerd/gc"
 	"github.com/containerd/containerd/leases"
@@ -28,17 +29,28 @@ import (
 	"github.com/containerd/containerd/namespaces"
 	"github.com/containerd/containerd/pkg/streaming"
 	"github.com/containerd/containerd/plugin"
+=======
+	"github.com/containerd/containerd/v2/core/leases"
+	"github.com/containerd/containerd/v2/core/metadata"
+	"github.com/containerd/containerd/v2/core/streaming"
+	"github.com/containerd/containerd/v2/pkg/gc"
+	"github.com/containerd/containerd/v2/pkg/namespaces"
+	"github.com/containerd/containerd/v2/plugins"
+	"github.com/containerd/errdefs"
+	"github.com/containerd/plugin"
+	"github.com/containerd/plugin/registry"
+>>>>>>> v2.0.7
 )
 
 func init() {
-	plugin.Register(&plugin.Registration{
-		Type: plugin.StreamingPlugin,
+	registry.Register(&plugin.Registration{
+		Type: plugins.StreamingPlugin,
 		ID:   "manager",
 		Requires: []plugin.Type{
-			plugin.MetadataPlugin,
+			plugins.MetadataPlugin,
 		},
 		InitFn: func(ic *plugin.InitContext) (interface{}, error) {
-			md, err := ic.Get(plugin.MetadataPlugin)
+			md, err := ic.GetSingle(plugins.MetadataPlugin)
 			if err != nil {
 				return nil, err
 			}

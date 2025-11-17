@@ -14,6 +14,16 @@
    limitations under the License.
 */
 
+<<<<<<< HEAD:integration/platform/doc.go
 // The platform package contains integration tests helpers for
 // platform specific behaviors.
 package platform
+=======
+// Package events defines the event pushing and subscription service.
+package events
+
+import types "github.com/containerd/containerd/api/types"
+
+// Deprecated: Use [types.Envelope].
+type Envelope = types.Envelope
+>>>>>>> v2.0.7:api/services/events/v1/doc.go

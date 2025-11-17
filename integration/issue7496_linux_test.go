@@ -29,11 +29,19 @@ import (
 	"testing"
 	"time"
 
+<<<<<<< HEAD
 	apitaskv2 "github.com/containerd/containerd/api/runtime/task/v2"
 	"github.com/containerd/containerd/integration/images"
 	"github.com/containerd/containerd/namespaces"
 	apitaskv1 "github.com/containerd/containerd/runtime/v1/shim/v1"
 	"github.com/containerd/containerd/runtime/v2/shim"
+=======
+	apitask "github.com/containerd/containerd/api/runtime/task/v3"
+	shimcore "github.com/containerd/containerd/v2/core/runtime/v2"
+	"github.com/containerd/containerd/v2/integration/images"
+	"github.com/containerd/containerd/v2/pkg/namespaces"
+	"github.com/containerd/containerd/v2/pkg/shim"
+>>>>>>> v2.0.7
 	"github.com/containerd/ttrpc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -43,6 +51,7 @@ import (
 //
 // NOTE: https://github.com/containerd/containerd/issues/8931 is the same issue.
 func TestIssue7496(t *testing.T) {
+<<<<<<< HEAD
 	t.Logf("Checking CRI config's default runtime")
 	criCfg, err := CRIConfig()
 	require.NoError(t, err)
@@ -50,6 +59,8 @@ func TestIssue7496(t *testing.T) {
 	typ := criCfg.ContainerdConfig.Runtimes[criCfg.ContainerdConfig.DefaultRuntimeName].Type
 	isShimV1 := typ == "io.containerd.runtime.v1.linux"
 
+=======
+>>>>>>> v2.0.7
 	ctx := namespaces.WithNamespace(context.Background(), "k8s.io")
 
 	t.Logf("Create a pod config and run sandbox container")
@@ -57,6 +68,7 @@ func TestIssue7496(t *testing.T) {
 	sbID, err := runtimeService.RunPodSandbox(sbConfig, *runtimeHandler)
 	require.NoError(t, err)
 
+<<<<<<< HEAD
 	sCli := newShimCli(ctx, t, sbID, isShimV1)
 
 	delayInSec := 12
@@ -65,6 +77,16 @@ func TestIssue7496(t *testing.T) {
 		delayInSec)
 
 	doneCh := injectDelayToUmount2(ctx, t, int(sCli.pid(ctx, t)), delayInSec /* CRI plugin uses 10 seconds to delete task */)
+=======
+	shimCli := connectToShim(ctx, t, containerdEndpoint, 3, sbID)
+
+	delayInSec := 12
+	t.Logf("[shim pid: %d]: Injecting %d seconds delay to umount2 syscall",
+		shimPid(ctx, t, shimCli),
+		delayInSec)
+
+	doneCh := injectDelayToUmount2(ctx, t, shimCli, delayInSec /* CRI plugin uses 10 seconds to delete task */)
+>>>>>>> v2.0.7
 
 	t.Logf("Create a container config and run container in a pod")
 	pauseImage := images.Get(images.Pause)
@@ -102,13 +124,22 @@ func TestIssue7496(t *testing.T) {
 	t.Logf("PodSandbox %s has been deleted and start to wait for strace exit", sbID)
 	select {
 	case <-time.After(15 * time.Second):
+<<<<<<< HEAD
 		shimPid, err := sCli.connect(ctx)
+=======
+		resp, err := shimCli.Connect(ctx, &apitask.ConnectRequest{})
+>>>>>>> v2.0.7
 		assert.Error(t, err, "should failed to call shim connect API")
 
 		t.Errorf("Strace doesn't exit in time")
 
+<<<<<<< HEAD
 		t.Logf("Cleanup the shim (pid: %d)", shimPid)
 		syscall.Kill(int(shimPid), syscall.SIGKILL)
+=======
+		t.Logf("Cleanup the shim (pid: %d)", resp.GetShimPid())
+		syscall.Kill(int(resp.GetShimPid()), syscall.SIGKILL)
+>>>>>>> v2.0.7
 		<-doneCh
 	case <-doneCh:
 	}
@@ -119,6 +150,7 @@ func TestIssue7496(t *testing.T) {
 // example, umount overlayfs rootfs which doesn't with volatile.
 //
 // REF: https://man7.org/linux/man-pages/man1/strace.1.html
+<<<<<<< HEAD
 func injectDelayToUmount2(ctx context.Context, t *testing.T, shimPid, delayInSec int) chan struct{} {
 	doneCh := make(chan struct{})
 
@@ -127,6 +159,20 @@ func injectDelayToUmount2(ctx context.Context, t *testing.T, shimPid, delayInSec
 		"--detach-on=execve", // stop to attach runc child-processes
 		"--trace=umount2",    // only trace umount2 syscall
 		"-e", "inject=umount2:delay_enter="+strconv.Itoa(delayInSec)+"s",
+=======
+func injectDelayToUmount2(ctx context.Context, t *testing.T, shimCli apitask.TTRPCTaskService, delayInSec int) chan struct{} {
+	pid := shimPid(ctx, t, shimCli)
+
+	doneCh := make(chan struct{})
+
+	// use strace command to mock the delay of umount2
+	// this require strace version >= 4.22
+	cmd := exec.CommandContext(ctx, "strace",
+		"-p", strconv.Itoa(int(pid)), "-f", // attach to all the threads
+		"-b", "execve", // stop to attach runc child-processes
+		"-e", "trace=umount2", // only trace umount2 syscall
+		"-e", "inject=umount2:delay_enter="+strconv.Itoa(delayInSec)+"000000",
+>>>>>>> v2.0.7
 	)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Pdeathsig: syscall.SIGKILL}
 
@@ -159,6 +205,7 @@ func injectDelayToUmount2(ctx context.Context, t *testing.T, shimPid, delayInSec
 	return doneCh
 }
 
+<<<<<<< HEAD
 type shimCli struct {
 	isV1 bool
 
@@ -168,6 +215,10 @@ type shimCli struct {
 
 func newShimCli(ctx context.Context, t *testing.T, id string, isV1 bool) *shimCli {
 	addr, err := shim.SocketAddress(ctx, containerdEndpoint, id)
+=======
+func connectToShim(ctx context.Context, t *testing.T, ctrdEndpoint string, version int, id string) shimcore.TaskServiceClient {
+	addr, err := shim.SocketAddress(ctx, ctrdEndpoint, id, false)
+>>>>>>> v2.0.7
 	require.NoError(t, err)
 	addr = strings.TrimPrefix(addr, "unix://")
 
@@ -175,6 +226,7 @@ func newShimCli(ctx context.Context, t *testing.T, id string, isV1 bool) *shimCl
 	require.NoError(t, err)
 
 	client := ttrpc.NewClient(conn)
+<<<<<<< HEAD
 
 	cli := &shimCli{isV1: isV1}
 	if isV1 {
@@ -205,4 +257,15 @@ func (cli *shimCli) pid(ctx context.Context, t *testing.T) uint32 {
 	pid, err := cli.connect(ctx)
 	require.NoError(t, err)
 	return pid
+=======
+	cli, err := shimcore.NewTaskClient(client, version)
+	require.NoError(t, err)
+	return cli
+}
+
+func shimPid(ctx context.Context, t *testing.T, shimCli shimcore.TaskServiceClient) uint32 {
+	resp, err := shimCli.Connect(ctx, &apitask.ConnectRequest{})
+	require.NoError(t, err)
+	return resp.GetShimPid()
+>>>>>>> v2.0.7
 }

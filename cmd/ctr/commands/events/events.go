@@ -20,29 +20,34 @@ import (
 	"encoding/json"
 	"fmt"
 
+<<<<<<< HEAD
 	"github.com/containerd/containerd/cmd/ctr/commands"
 	"github.com/containerd/containerd/events"
+=======
+	"github.com/containerd/containerd/v2/cmd/ctr/commands"
+	"github.com/containerd/containerd/v2/core/events"
+>>>>>>> v2.0.7
 	"github.com/containerd/log"
 	"github.com/containerd/typeurl/v2"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 
 	// Register grpc event types
 	_ "github.com/containerd/containerd/api/events"
 )
 
 // Command is the cli command for displaying containerd events
-var Command = cli.Command{
+var Command = &cli.Command{
 	Name:    "events",
 	Aliases: []string{"event"},
 	Usage:   "Display containerd events",
-	Action: func(context *cli.Context) error {
-		client, ctx, cancel, err := commands.NewClient(context)
+	Action: func(cliContext *cli.Context) error {
+		client, ctx, cancel, err := commands.NewClient(cliContext)
 		if err != nil {
 			return err
 		}
 		defer cancel()
 		eventsClient := client.EventService()
-		eventsCh, errCh := eventsClient.Subscribe(ctx, context.Args()...)
+		eventsCh, errCh := eventsClient.Subscribe(ctx, cliContext.Args().Slice()...)
 		for {
 			var e *events.Envelope
 			select {

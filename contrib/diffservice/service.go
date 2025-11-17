@@ -20,6 +20,7 @@ import (
 	"context"
 
 	diffapi "github.com/containerd/containerd/api/services/diff/v1"
+<<<<<<< HEAD
 	"github.com/containerd/containerd/api/types"
 	"github.com/containerd/containerd/diff"
 	"github.com/containerd/containerd/errdefs"
@@ -27,6 +28,16 @@ import (
 	"github.com/containerd/typeurl/v2"
 	"github.com/opencontainers/go-digest"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+=======
+	"github.com/containerd/errdefs"
+	"github.com/containerd/errdefs/pkg/errgrpc"
+	"github.com/containerd/typeurl/v2"
+	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+
+	"github.com/containerd/containerd/v2/core/diff"
+	"github.com/containerd/containerd/v2/core/mount"
+	"github.com/containerd/containerd/v2/pkg/oci"
+>>>>>>> v2.0.7
 )
 
 type service struct {
@@ -43,14 +54,23 @@ func FromApplierAndComparer(a diff.Applier, c diff.Comparer) diffapi.DiffServer 
 }
 func (s *service) Apply(ctx context.Context, er *diffapi.ApplyRequest) (*diffapi.ApplyResponse, error) {
 	if s.applier == nil {
+<<<<<<< HEAD
 		return nil, errdefs.ToGRPC(errdefs.ErrNotImplemented)
+=======
+		return nil, errgrpc.ToGRPC(errdefs.ErrNotImplemented)
+>>>>>>> v2.0.7
 	}
 
 	var (
 		ocidesc ocispec.Descriptor
 		err     error
+<<<<<<< HEAD
 		desc    = toDescriptor(er.Diff)
 		mounts  = toMounts(er.Mounts)
+=======
+		desc    = oci.DescriptorFromProto(er.Diff)
+		mounts  = mount.FromProto(er.Mounts)
+>>>>>>> v2.0.7
 	)
 
 	var opts []diff.ApplyOpt
@@ -65,23 +85,40 @@ func (s *service) Apply(ctx context.Context, er *diffapi.ApplyRequest) (*diffapi
 
 	ocidesc, err = s.applier.Apply(ctx, desc, mounts, opts...)
 	if err != nil {
+<<<<<<< HEAD
 		return nil, errdefs.ToGRPC(err)
 	}
 
 	return &diffapi.ApplyResponse{
 		Applied: fromDescriptor(ocidesc),
+=======
+		return nil, errgrpc.ToGRPC(err)
+	}
+
+	return &diffapi.ApplyResponse{
+		Applied: oci.DescriptorToProto(ocidesc),
+>>>>>>> v2.0.7
 	}, nil
 }
 
 func (s *service) Diff(ctx context.Context, dr *diffapi.DiffRequest) (*diffapi.DiffResponse, error) {
 	if s.comparer == nil {
+<<<<<<< HEAD
 		return nil, errdefs.ToGRPC(errdefs.ErrNotImplemented)
+=======
+		return nil, errgrpc.ToGRPC(errdefs.ErrNotImplemented)
+>>>>>>> v2.0.7
 	}
 	var (
 		ocidesc ocispec.Descriptor
 		err     error
+<<<<<<< HEAD
 		aMounts = toMounts(dr.Left)
 		bMounts = toMounts(dr.Right)
+=======
+		aMounts = mount.FromProto(dr.Left)
+		bMounts = mount.FromProto(dr.Right)
+>>>>>>> v2.0.7
 	)
 
 	var opts []diff.Opt
@@ -101,6 +138,7 @@ func (s *service) Diff(ctx context.Context, dr *diffapi.DiffRequest) (*diffapi.D
 
 	ocidesc, err = s.comparer.Compare(ctx, aMounts, bMounts, opts...)
 	if err != nil {
+<<<<<<< HEAD
 		return nil, errdefs.ToGRPC(err)
 	}
 
@@ -139,3 +177,12 @@ func fromDescriptor(d ocispec.Descriptor) *types.Descriptor {
 		Annotations: d.Annotations,
 	}
 }
+=======
+		return nil, errgrpc.ToGRPC(err)
+	}
+
+	return &diffapi.DiffResponse{
+		Diff: oci.DescriptorToProto(ocidesc),
+	}, nil
+}
+>>>>>>> v2.0.7

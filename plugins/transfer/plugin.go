@@ -19,6 +19,7 @@ package transfer
 import (
 	"fmt"
 
+<<<<<<< HEAD
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
@@ -35,32 +36,74 @@ import (
 	_ "github.com/containerd/containerd/pkg/transfer/archive"
 	_ "github.com/containerd/containerd/pkg/transfer/image"
 	_ "github.com/containerd/containerd/pkg/transfer/registry"
+=======
+	"github.com/containerd/containerd/v2/core/diff"
+	"github.com/containerd/containerd/v2/core/leases"
+	"github.com/containerd/containerd/v2/core/metadata"
+	"github.com/containerd/containerd/v2/core/transfer/local"
+	"github.com/containerd/containerd/v2/core/unpack"
+	"github.com/containerd/containerd/v2/pkg/imageverifier"
+	"github.com/containerd/containerd/v2/plugins"
+	"github.com/containerd/errdefs"
+	"github.com/containerd/log"
+	"github.com/containerd/platforms"
+	"github.com/containerd/plugin"
+	"github.com/containerd/plugin/registry"
+
+	// Load packages with type registrations
+	_ "github.com/containerd/containerd/v2/core/transfer/archive"
+	_ "github.com/containerd/containerd/v2/core/transfer/image"
+	_ "github.com/containerd/containerd/v2/core/transfer/registry"
+>>>>>>> v2.0.7
 )
 
 // Register local transfer service plugin
 func init() {
-	plugin.Register(&plugin.Registration{
-		Type: plugin.TransferPlugin,
+	registry.Register(&plugin.Registration{
+		Type: plugins.TransferPlugin,
 		ID:   "local",
 		Requires: []plugin.Type{
+<<<<<<< HEAD
 			plugin.LeasePlugin,
 			plugin.MetadataPlugin,
 			plugin.DiffPlugin,
+=======
+			plugins.LeasePlugin,
+			plugins.MetadataPlugin,
+			plugins.DiffPlugin,
+			plugins.ImageVerifierPlugin,
+>>>>>>> v2.0.7
 		},
 		Config: defaultConfig(),
 		InitFn: func(ic *plugin.InitContext) (interface{}, error) {
 			config := ic.Config.(*transferConfig)
-			m, err := ic.Get(plugin.MetadataPlugin)
+			m, err := ic.GetSingle(plugins.MetadataPlugin)
 			if err != nil {
 				return nil, err
 			}
 			ms := m.(*metadata.DB)
-			l, err := ic.Get(plugin.LeasePlugin)
+
+			var lc local.TransferConfig
+
+			l, err := ic.GetSingle(plugins.LeasePlugin)
 			if err != nil {
 				return nil, err
 			}
+			lc.Leases = l.(leases.Manager)
+
+			vps, err := ic.GetByType(plugins.ImageVerifierPlugin)
+			if err != nil {
+				return nil, err
+			}
+			if len(vps) > 0 {
+				lc.Verifiers = make(map[string]imageverifier.ImageVerifier)
+				for name, vp := range vps {
+					lc.Verifiers[name] = vp.(imageverifier.ImageVerifier)
+				}
+			}
 
 			// Set configuration based on default or user input
+<<<<<<< HEAD
 			var lc local.TransferConfig
 			lc.MaxConcurrentDownloads = config.MaxConcurrentDownloads
 			lc.MaxConcurrentUploadedLayers = config.MaxConcurrentUploadedLayers
@@ -68,6 +111,20 @@ func init() {
 				p, err := platforms.Parse(uc.Platform)
 				if err != nil {
 					return nil, fmt.Errorf("%s: platform configuration %v invalid", plugin.TransferPlugin, uc.Platform)
+=======
+			lc.MaxConcurrentDownloads = config.MaxConcurrentDownloads
+			lc.MaxConcurrentUploadedLayers = config.MaxConcurrentUploadedLayers
+
+			// If UnpackConfiguration is not defined, set the default.
+			// If UnpackConfiguration is defined and empty, ignore.
+			if config.UnpackConfiguration == nil {
+				config.UnpackConfiguration = defaultUnpackConfig()
+			}
+			for _, uc := range config.UnpackConfiguration {
+				p, err := platforms.Parse(uc.Platform)
+				if err != nil {
+					return nil, fmt.Errorf("%s: platform configuration %v invalid", plugins.TransferPlugin, uc.Platform)
+>>>>>>> v2.0.7
 				}
 
 				sn := ms.Snapshotter(uc.Snapshotter)
@@ -75,6 +132,7 @@ func init() {
 					return nil, fmt.Errorf("snapshotter %q not found: %w", uc.Snapshotter, errdefs.ErrNotFound)
 				}
 
+<<<<<<< HEAD
 				diffPlugins, err := ic.GetByType(plugin.DiffPlugin)
 				if err != nil {
 					return nil, fmt.Errorf("error loading diff plugins: %w", err)
@@ -87,12 +145,25 @@ func init() {
 						return nil, fmt.Errorf("diff plugin %q: %w", uc.Differ, errdefs.ErrNotFound)
 					}
 					inst, err := plugin.Instance()
+=======
+				var applier diff.Applier
+				target := platforms.Only(p)
+				if uc.Differ != "" {
+					inst, err := ic.GetByID(plugins.DiffPlugin, uc.Differ)
+>>>>>>> v2.0.7
 					if err != nil {
 						return nil, fmt.Errorf("failed to get instance for diff plugin %q: %w", uc.Differ, err)
 					}
 					applier = inst.(diff.Applier)
 				} else {
+<<<<<<< HEAD
 					for name, plugin := range diffPlugins {
+=======
+					for name, plugin := range ic.GetAll() {
+						if plugin.Registration.Type != plugins.DiffPlugin {
+							continue
+						}
+>>>>>>> v2.0.7
 						var matched bool
 						for _, p := range plugin.Meta.Platforms {
 							if target.Match(p) {
@@ -103,7 +174,11 @@ func init() {
 							continue
 						}
 						if applier != nil {
+<<<<<<< HEAD
 							log.G(ic.Context).Warnf("multiple differs match for platform, set `differ` option to choose, skipping %q", name)
+=======
+							log.G(ic.Context).Warnf("multiple differs match for platform, set `differ` option to choose, skipping %q", plugin.Registration.ID)
+>>>>>>> v2.0.7
 							continue
 						}
 						inst, err := plugin.Instance()
@@ -127,7 +202,7 @@ func init() {
 			}
 			lc.RegistryConfigPath = config.RegistryConfigPath
 
-			return local.NewTransferService(l.(leases.Manager), ms.ContentStore(), metadata.NewImageStore(ms), &lc), nil
+			return local.NewTransferService(ms.ContentStore(), metadata.NewImageStore(ms), lc), nil
 		},
 	})
 }
@@ -140,7 +215,11 @@ type transferConfig struct {
 	MaxConcurrentUploadedLayers int `toml:"max_concurrent_uploaded_layers"`
 
 	// UnpackConfiguration is used to read config from toml
+<<<<<<< HEAD
 	UnpackConfiguration []unpackConfiguration `toml:"unpack_config"`
+=======
+	UnpackConfiguration []unpackConfiguration `toml:"unpack_config,omitempty"`
+>>>>>>> v2.0.7
 
 	// RegistryConfigPath is a path to the root directory containing registry-specific configurations
 	RegistryConfigPath string `toml:"config_path"`
@@ -161,6 +240,7 @@ func defaultConfig() *transferConfig {
 	return &transferConfig{
 		MaxConcurrentDownloads:      3,
 		MaxConcurrentUploadedLayers: 3,
+<<<<<<< HEAD
 		UnpackConfiguration: []unpackConfiguration{
 			{
 				Platform:    platforms.Format(platforms.DefaultSpec()),
@@ -168,5 +248,7 @@ func defaultConfig() *transferConfig {
 				Differ:      containerd.DefaultDiffer,
 			},
 		},
+=======
+>>>>>>> v2.0.7
 	}
 }

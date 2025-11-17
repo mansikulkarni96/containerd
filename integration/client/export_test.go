@@ -25,6 +25,7 @@ import (
 	"strings"
 	"testing"
 
+<<<<<<< HEAD
 	"github.com/containerd/platforms"
 	"github.com/google/uuid"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
@@ -35,6 +36,17 @@ import (
 	"github.com/containerd/containerd/images"
 	"github.com/containerd/containerd/images/archive"
 	"github.com/containerd/containerd/namespaces"
+=======
+	. "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/core/content"
+	"github.com/containerd/containerd/v2/core/images"
+	"github.com/containerd/containerd/v2/core/images/archive"
+	"github.com/containerd/containerd/v2/pkg/namespaces"
+	"github.com/containerd/errdefs"
+	"github.com/containerd/platforms"
+	"github.com/google/uuid"
+	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+>>>>>>> v2.0.7
 )
 
 func TestExportAllCases(t *testing.T) {
@@ -342,10 +354,10 @@ func assertOCITar(t *testing.T, r io.Reader, docker bool) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if h.Name == "oci-layout" {
+		if h.Name == ocispec.ImageLayoutFile {
 			foundOCILayout = true
 		}
-		if h.Name == "index.json" {
+		if h.Name == ocispec.ImageIndexFile {
 			foundIndexJSON = true
 		}
 		if h.Name == "manifest.json" {

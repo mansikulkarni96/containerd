@@ -25,6 +25,7 @@ const (
 	PullSchema1Image Warning = Prefix + "pull-schema-1-image"
 	// GoPluginLibrary is a warning for the use of dynamic library Go plugins
 	GoPluginLibrary Warning = Prefix + "go-plugin-library"
+<<<<<<< HEAD
 	// CRISystemdCgroupV1 is a warning for the `systemd_cgroup` property
 	CRISystemdCgroupV1 Warning = Prefix + "cri-systemd-cgroup-v1"
 	// CRIUntrustedWorkloadRuntime is a warning for the `untrusted_workload_runtime` property
@@ -35,12 +36,15 @@ const (
 	CRIRuntimeEngine Warning = Prefix + "cri-runtime-engine"
 	// CRIRuntimeRoot is a warning for the `runtime_root` property
 	CRIRuntimeRoot Warning = Prefix + "cri-runtime-root"
+=======
+>>>>>>> v2.0.7
 	// CRIRegistryMirrors is a warning for the use of the `mirrors` property
 	CRIRegistryMirrors Warning = Prefix + "cri-registry-mirrors"
 	// CRIRegistryAuths is a warning for the use of the `auths` property
 	CRIRegistryAuths Warning = Prefix + "cri-registry-auths"
 	// CRIRegistryConfigs is a warning for the use of the `configs` property
 	CRIRegistryConfigs Warning = Prefix + "cri-registry-configs"
+<<<<<<< HEAD
 	// CRIAPIV1Alpha2 is a warning for the use of CRI-API v1alpha2
 	CRIAPIV1Alpha2 Warning = Prefix + "cri-api-v1alpha2"
 	// AUFSSnapshotter is a warning for the use of the aufs snapshotter
@@ -53,12 +57,15 @@ const (
 	RuntimeRuncV1 Warning = Prefix + "runtime-runc-v1"
 	// CRICRIUPath is a warning for the use of the `CriuPath` property
 	CRICRIUPath Warning = Prefix + "cri-criu-path"
+=======
+>>>>>>> v2.0.7
 	// OTLPTracingConfig is a warning for the use of the `otlp` property
 	TracingOTLPConfig Warning = Prefix + "tracing-processor-config"
 	// TracingServiceConfig is a warning for the use of the `tracing` property
 	TracingServiceConfig Warning = Prefix + "tracing-service-config"
 )
 
+<<<<<<< HEAD
 var messages = map[Warning]string{
 	PullSchema1Image: "Schema 1 images are deprecated since containerd v1.7 and removed in containerd v2.0. " +
 		`Since containerd v1.7.8, schema 1 images are identified by the "io.containerd.image/converted-docker-schema1" label.`,
@@ -86,6 +93,24 @@ var messages = map[Warning]string{
 	RuntimeRuncV1:   "The `io.containerd.runc.v1` runtime is deprecated since containerd v1.4 and removed in containerd v2.0. Use the `io.containerd.runc.v2` runtime instead.",
 	CRICRIUPath: "The `CriuPath` property of `[plugins.\"io.containerd.grpc.v1.cri\".containerd.runtimes.*.options]` is deprecated since containerd v1.7 and will be removed in containerd v2.0. " +
 		"Use a criu binary in $PATH instead.",
+=======
+const (
+	EnvPrefix           = "CONTAINERD_ENABLE_DEPRECATED_"
+	EnvPullSchema1Image = EnvPrefix + "PULL_SCHEMA_1_IMAGE"
+)
+
+var messages = map[Warning]string{
+	PullSchema1Image: "Schema 1 images are deprecated since containerd v1.7, disabled in containerd v2.0, and will be removed in containerd v2.1. " +
+		`Since containerd v1.7.8, schema 1 images are identified by the "io.containerd.image/converted-docker-schema1" label.`,
+	GoPluginLibrary: "Dynamically-linked Go plugins as containerd runtimes are deprecated since containerd v2.0 and removed in containerd v2.1.",
+	CRIRegistryMirrors: "The `mirrors` property of `[plugins.\"io.containerd.grpc.v1.cri\".registry]` is deprecated since containerd v1.5 and will be removed in containerd v2.1." +
+		"Use `config_path` instead.",
+	CRIRegistryAuths: "The `auths` property of `[plugins.\"io.containerd.grpc.v1.cri\".registry]` is deprecated since containerd v1.3 and will be removed in containerd v2.1." +
+		"Use `ImagePullSecrets` instead.",
+	CRIRegistryConfigs: "The `configs` property of `[plugins.\"io.containerd.grpc.v1.cri\".registry]` is deprecated since containerd v1.5 and will be removed in containerd v2.1." +
+		"Use `config_path` instead.",
+
+>>>>>>> v2.0.7
 	TracingOTLPConfig: "The `otlp` property of `[plugins.\"io.containerd.tracing.processor.v1\".otlp]` is deprecated since containerd v1.6 and will be removed in containerd v2.0." +
 		"Use OTLP environment variables instead: https://opentelemetry.io/docs/specs/otel/protocol/exporter/",
 	TracingServiceConfig: "The `tracing` property of `[plugins.\"io.containerd.internal.v1\".tracing]` is deprecated since containerd v1.6 and will be removed in containerd v2.0." +

@@ -17,36 +17,45 @@
 package tasks
 
 import (
-	gocontext "context"
+	"context"
 
+<<<<<<< HEAD
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/cio"
 	"github.com/containerd/containerd/cmd/ctr/commands"
 	"github.com/containerd/log"
 	"github.com/urfave/cli"
+=======
+	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/cmd/ctr/commands"
+	"github.com/containerd/containerd/v2/pkg/cio"
+	"github.com/containerd/log"
+	"github.com/urfave/cli/v2"
+>>>>>>> v2.0.7
 )
 
-var deleteCommand = cli.Command{
+var deleteCommand = &cli.Command{
 	Name:      "delete",
 	Usage:     "Delete one or more tasks",
 	ArgsUsage: "CONTAINER [CONTAINER, ...]",
 	Aliases:   []string{"del", "remove", "rm"},
 	Flags: []cli.Flag{
-		cli.BoolFlag{
-			Name:  "force, f",
-			Usage: "Force delete task process",
+		&cli.BoolFlag{
+			Name:    "force",
+			Aliases: []string{"f"},
+			Usage:   "Force delete task process",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "exec-id",
 			Usage: "Process ID to kill",
 		},
 	},
-	Action: func(context *cli.Context) error {
+	Action: func(cliContext *cli.Context) error {
 		var (
-			execID = context.String("exec-id")
-			force  = context.Bool("force")
+			execID = cliContext.String("exec-id")
+			force  = cliContext.Bool("force")
 		)
-		client, ctx, cancel, err := commands.NewClient(context)
+		client, ctx, cancel, err := commands.NewClient(cliContext)
 		if err != nil {
 			return err
 		}
@@ -57,7 +66,7 @@ var deleteCommand = cli.Command{
 		}
 		var exitErr error
 		if execID != "" {
-			task, err := loadTask(ctx, client, context.Args().First())
+			task, err := loadTask(ctx, client, cliContext.Args().First())
 			if err != nil {
 				return err
 			}
@@ -70,10 +79,10 @@ var deleteCommand = cli.Command{
 				return err
 			}
 			if ec := status.ExitCode(); ec != 0 {
-				return cli.NewExitError("", int(ec))
+				return cli.Exit("", int(ec))
 			}
 		} else {
-			for _, target := range context.Args() {
+			for _, target := range cliContext.Args().Slice() {
 				task, err := loadTask(ctx, client, target)
 				if err != nil {
 					if exitErr == nil {
@@ -99,7 +108,7 @@ var deleteCommand = cli.Command{
 	},
 }
 
-func loadTask(ctx gocontext.Context, client *containerd.Client, containerID string) (containerd.Task, error) {
+func loadTask(ctx context.Context, client *containerd.Client, containerID string) (containerd.Task, error) {
 	container, err := client.LoadContainer(ctx, containerID)
 	if err != nil {
 		return nil, err

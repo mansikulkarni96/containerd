@@ -17,6 +17,7 @@
 package commands
 
 import (
+<<<<<<< HEAD
 	gocontext "context"
 	"os"
 	"strconv"
@@ -27,6 +28,17 @@ import (
 	ptypes "github.com/containerd/containerd/protobuf/types"
 	"github.com/containerd/log"
 	"github.com/urfave/cli"
+=======
+	"context"
+	"os"
+	"strconv"
+
+	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/pkg/epoch"
+	"github.com/containerd/containerd/v2/pkg/namespaces"
+	"github.com/containerd/log"
+	"github.com/urfave/cli/v2"
+>>>>>>> v2.0.7
 )
 
 // AppContext returns the context for a command. Should only be called once per
@@ -34,18 +46,18 @@ import (
 //
 // This will ensure the namespace is picked up and set the timeout, if one is
 // defined.
-func AppContext(context *cli.Context) (gocontext.Context, gocontext.CancelFunc) {
+func AppContext(cliContext *cli.Context) (context.Context, context.CancelFunc) {
 	var (
-		ctx       = gocontext.Background()
-		timeout   = context.GlobalDuration("timeout")
-		namespace = context.GlobalString("namespace")
-		cancel    gocontext.CancelFunc
+		ctx       = cliContext.Context
+		timeout   = cliContext.Duration("timeout")
+		namespace = cliContext.String("namespace")
+		cancel    context.CancelFunc
 	)
 	ctx = namespaces.WithNamespace(ctx, namespace)
 	if timeout > 0 {
-		ctx, cancel = gocontext.WithTimeout(ctx, timeout)
+		ctx, cancel = context.WithTimeout(ctx, timeout)
 	} else {
-		ctx, cancel = gocontext.WithCancel(ctx)
+		ctx, cancel = context.WithCancel(ctx)
 	}
 	if tm, err := epoch.SourceDateEpoch(); err != nil {
 		log.L.WithError(err).Warn("Failed to read SOURCE_DATE_EPOCH")
@@ -57,14 +69,18 @@ func AppContext(context *cli.Context) (gocontext.Context, gocontext.CancelFunc) 
 }
 
 // NewClient returns a new containerd client
-func NewClient(context *cli.Context, opts ...containerd.ClientOpt) (*containerd.Client, gocontext.Context, gocontext.CancelFunc, error) {
-	timeoutOpt := containerd.WithTimeout(context.GlobalDuration("connect-timeout"))
+func NewClient(cliContext *cli.Context, opts ...containerd.Opt) (*containerd.Client, context.Context, context.CancelFunc, error) {
+	timeoutOpt := containerd.WithTimeout(cliContext.Duration("connect-timeout"))
 	opts = append(opts, timeoutOpt)
-	client, err := containerd.New(context.GlobalString("address"), opts...)
+	client, err := containerd.New(cliContext.String("address"), opts...)
 	if err != nil {
 		return nil, nil, nil, err
 	}
+<<<<<<< HEAD
 	ctx, cancel := AppContext(context)
+=======
+	ctx, cancel := AppContext(cliContext)
+>>>>>>> v2.0.7
 	var suppressDeprecationWarnings bool
 	if s := os.Getenv("CONTAINERD_SUPPRESS_DEPRECATION_WARNINGS"); s != "" {
 		suppressDeprecationWarnings, err = strconv.ParseBool(s)
@@ -73,7 +89,11 @@ func NewClient(context *cli.Context, opts ...containerd.ClientOpt) (*containerd.
 		}
 	}
 	if !suppressDeprecationWarnings {
+<<<<<<< HEAD
 		resp, err := client.IntrospectionService().Server(ctx, &ptypes.Empty{})
+=======
+		resp, err := client.IntrospectionService().Server(ctx)
+>>>>>>> v2.0.7
 		if err != nil {
 			log.L.WithError(err).Warn("Failed to check deprecations")
 		} else {

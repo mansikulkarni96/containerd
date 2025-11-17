@@ -32,6 +32,7 @@ import (
 	"testing"
 	"time"
 
+<<<<<<< HEAD
 	. "github.com/containerd/containerd"
 	"github.com/containerd/containerd/archive/compression"
 	"github.com/containerd/containerd/archive/tartest"
@@ -44,6 +45,20 @@ import (
 	"github.com/containerd/containerd/pkg/transfer"
 	tarchive "github.com/containerd/containerd/pkg/transfer/archive"
 	"github.com/containerd/containerd/pkg/transfer/image"
+=======
+	. "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/core/content"
+	"github.com/containerd/containerd/v2/core/images"
+	"github.com/containerd/containerd/v2/core/images/archive"
+	"github.com/containerd/containerd/v2/core/leases"
+	"github.com/containerd/containerd/v2/core/transfer"
+	tarchive "github.com/containerd/containerd/v2/core/transfer/archive"
+	"github.com/containerd/containerd/v2/core/transfer/image"
+	"github.com/containerd/containerd/v2/pkg/archive/compression"
+	"github.com/containerd/containerd/v2/pkg/archive/tartest"
+	"github.com/containerd/containerd/v2/pkg/namespaces"
+	"github.com/containerd/containerd/v2/pkg/oci"
+>>>>>>> v2.0.7
 	"github.com/containerd/platforms"
 	"github.com/google/uuid"
 
@@ -79,7 +94,7 @@ func testExportImport(t *testing.T, imageName string) {
 	}
 	defer client.Close()
 
-	_, err = client.Fetch(ctx, imageName)
+	_, err = client.Fetch(ctx, imageName, WithPlatformMatcher(platforms.Default()))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -173,9 +188,17 @@ func TestImport(t *testing.T) {
 
 	m1, d3, expManifest := createManifest(c1, [][]byte{b1})
 
+<<<<<<< HEAD
 	c2, _ := createConfig(runtime.GOOS, runtime.GOARCH, "test2")
 	m2, d5, _ := createManifest(c2, [][]byte{{1, 2, 3, 4, 5}})
 
+=======
+	importLabels := map[string]string{"foo": "bar"}
+
+	c2, _ := createConfig(runtime.GOOS, runtime.GOARCH, "test2")
+	m2, d5, _ := createManifest(c2, [][]byte{{1, 2, 3, 4, 5}})
+
+>>>>>>> v2.0.7
 	ml1, d6 := createManifestList(m1, m2)
 
 	checkManifest := func(ctx context.Context, t *testing.T, provider content.Provider, d ocispec.Descriptor, expManifest *ocispec.Manifest) {
@@ -215,10 +238,17 @@ func TestImport(t *testing.T) {
 		{
 			Name: "OCI-IndexWithoutAnyManifest",
 			Writer: tartest.TarAll(
+<<<<<<< HEAD
 				tc.Dir("blobs", 0755),
 				tc.Dir("blobs/sha256", 0755),
 				tc.File("index.json", createIndex(ml1, ocispec.MediaTypeImageIndex, "docker.io/library/sparse:ok"), 0644),
 				tc.File("blobs/sha256/"+d6.Encoded(), ml1, 0644),
+=======
+				tc.Dir(ocispec.ImageBlobsDir, 0755),
+				tc.Dir(ocispec.ImageBlobsDir+"/sha256", 0755),
+				tc.File(ocispec.ImageIndexFile, createIndex(ml1, ocispec.MediaTypeImageIndex, "docker.io/library/sparse:ok"), 0644),
+				tc.File(ocispec.ImageBlobsDir+"/sha256/"+d6.Encoded(), ml1, 0644),
+>>>>>>> v2.0.7
 				tc.File(ocispec.ImageLayoutFile, []byte(`{"imageLayoutVersion":"`+ocispec.ImageLayoutVersion+`"}`), 0644),
 			),
 			Check: func(ctx context.Context, t *testing.T, client *Client, imgs []images.Image) {
@@ -291,12 +321,13 @@ func TestImport(t *testing.T) {
 		{
 			Name: "OCI-BadFormat",
 			Writer: tartest.TarAll(
-				tc.File("oci-layout", []byte(`{"imageLayoutVersion":"2.0.0"}`), 0644),
+				tc.File(ocispec.ImageLayoutFile, []byte(`{"imageLayoutVersion":"2.0.0"}`), 0644),
 			),
 		},
 		{
 			Name: "OCI",
 			Writer: tartest.TarAll(
+<<<<<<< HEAD
 				tc.Dir("blobs", 0755),
 				tc.Dir("blobs/sha256", 0755),
 				tc.File("blobs/sha256/"+d1.Encoded(), b1, 0644),
@@ -304,6 +335,15 @@ func TestImport(t *testing.T) {
 				tc.File("blobs/sha256/"+d3.Encoded(), m1, 0644),
 				tc.File("index.json", createIndex(m1, ocispec.MediaTypeImageManifest, "latest", "docker.io/lib/img:ok"), 0644),
 				tc.File("oci-layout", []byte(`{"imageLayoutVersion":"1.0.0"}`), 0644),
+=======
+				tc.Dir(ocispec.ImageBlobsDir, 0755),
+				tc.Dir(ocispec.ImageBlobsDir+"/sha256", 0755),
+				tc.File(ocispec.ImageBlobsDir+"/sha256/"+d1.Encoded(), b1, 0644),
+				tc.File(ocispec.ImageBlobsDir+"/sha256/"+d2.Encoded(), c1, 0644),
+				tc.File(ocispec.ImageBlobsDir+"/sha256/"+d3.Encoded(), m1, 0644),
+				tc.File(ocispec.ImageIndexFile, createIndex(m1, ocispec.MediaTypeImageManifest, "latest", "docker.io/lib/img:ok"), 0644),
+				tc.File(ocispec.ImageLayoutFile, []byte(`{"imageLayoutVersion":"`+ocispec.ImageLayoutVersion+`"}`), 0644),
+>>>>>>> v2.0.7
 			),
 			Check: func(ctx context.Context, t *testing.T, client *Client, imgs []images.Image) {
 				names := []string{
@@ -313,11 +353,38 @@ func TestImport(t *testing.T) {
 
 				checkImages(t, d3, imgs, names...)
 				checkManifest(ctx, t, client.ContentStore(), imgs[0].Target, expManifest)
+<<<<<<< HEAD
+=======
+			},
+		},
+		{
+			Name: "OCI-Labels",
+			Writer: tartest.TarAll(
+				tc.Dir(ocispec.ImageBlobsDir, 0o755),
+				tc.Dir(ocispec.ImageBlobsDir+"/sha256", 0o755),
+				tc.File(ocispec.ImageBlobsDir+"/sha256/"+d1.Encoded(), b1, 0o644),
+				tc.File(ocispec.ImageBlobsDir+"/sha256/"+d2.Encoded(), c1, 0o644),
+				tc.File(ocispec.ImageBlobsDir+"/sha256/"+d3.Encoded(), m1, 0o644),
+				tc.File(ocispec.ImageIndexFile, createIndex(m1, "latest", "docker.io/lib/img:ok"), 0o644),
+				tc.File(ocispec.ImageLayoutFile, []byte(`{"imageLayoutVersion":"`+ocispec.ImageLayoutVersion+`"}`), 0o644),
+			),
+			Check: func(ctx context.Context, t *testing.T, _ *Client, imgs []images.Image) {
+				for i := range imgs {
+					if !reflect.DeepEqual(imgs[i].Labels, importLabels) {
+						t.Fatalf("DeepEqual on labels failed img.Labels: %+v expected: %+v", imgs[i].Labels, importLabels)
+					}
+				}
+			},
+			Opts: []ImportOpt{
+				WithImageLabels(importLabels),
+				WithImageRefTranslator(archive.AddRefPrefix("localhost:5000/myimage")),
+>>>>>>> v2.0.7
 			},
 		},
 		{
 			Name: "OCIPrefixName",
 			Writer: tartest.TarAll(
+<<<<<<< HEAD
 				tc.Dir("blobs", 0755),
 				tc.Dir("blobs/sha256", 0755),
 				tc.File("blobs/sha256/"+d1.Encoded(), b1, 0644),
@@ -325,6 +392,15 @@ func TestImport(t *testing.T) {
 				tc.File("blobs/sha256/"+d3.Encoded(), m1, 0644),
 				tc.File("index.json", createIndex(m1, ocispec.MediaTypeImageManifest, "latest", "docker.io/lib/img:ok"), 0644),
 				tc.File("oci-layout", []byte(`{"imageLayoutVersion":"1.0.0"}`), 0644),
+=======
+				tc.Dir(ocispec.ImageBlobsDir, 0755),
+				tc.Dir(ocispec.ImageBlobsDir+"/sha256", 0755),
+				tc.File(ocispec.ImageBlobsDir+"/sha256/"+d1.Encoded(), b1, 0644),
+				tc.File(ocispec.ImageBlobsDir+"/sha256/"+d2.Encoded(), c1, 0644),
+				tc.File(ocispec.ImageBlobsDir+"/sha256/"+d3.Encoded(), m1, 0644),
+				tc.File(ocispec.ImageIndexFile, createIndex(m1, ocispec.MediaTypeImageManifest, "latest", "docker.io/lib/img:ok"), 0644),
+				tc.File(ocispec.ImageLayoutFile, []byte(`{"imageLayoutVersion":"`+ocispec.ImageLayoutVersion+`"}`), 0644),
+>>>>>>> v2.0.7
 			),
 			Check: func(ctx context.Context, t *testing.T, client *Client, imgs []images.Image) {
 				names := []string{
@@ -342,6 +418,7 @@ func TestImport(t *testing.T) {
 		{
 			Name: "OCIPrefixName2",
 			Writer: tartest.TarAll(
+<<<<<<< HEAD
 				tc.Dir("blobs", 0755),
 				tc.Dir("blobs/sha256", 0755),
 				tc.File("blobs/sha256/"+d1.Encoded(), b1, 0644),
@@ -349,6 +426,15 @@ func TestImport(t *testing.T) {
 				tc.File("blobs/sha256/"+d3.Encoded(), m1, 0644),
 				tc.File("index.json", createIndex(m1, ocispec.MediaTypeImageManifest, "latest", "localhost:5000/myimage:old", "docker.io/lib/img:ok"), 0644),
 				tc.File("oci-layout", []byte(`{"imageLayoutVersion":"1.0.0"}`), 0644),
+=======
+				tc.Dir(ocispec.ImageBlobsDir, 0755),
+				tc.Dir(ocispec.ImageBlobsDir+"/sha256", 0755),
+				tc.File(ocispec.ImageBlobsDir+"/sha256/"+d1.Encoded(), b1, 0644),
+				tc.File(ocispec.ImageBlobsDir+"/sha256/"+d2.Encoded(), c1, 0644),
+				tc.File(ocispec.ImageBlobsDir+"/sha256/"+d3.Encoded(), m1, 0644),
+				tc.File(ocispec.ImageIndexFile, createIndex(m1, ocispec.MediaTypeImageManifest, "latest", "localhost:5000/myimage:old", "docker.io/lib/img:ok"), 0644),
+				tc.File(ocispec.ImageLayoutFile, []byte(`{"imageLayoutVersion":"`+ocispec.ImageLayoutVersion+`"}`), 0644),
+>>>>>>> v2.0.7
 			),
 			Check: func(ctx context.Context, t *testing.T, client *Client, imgs []images.Image) {
 				names := []string{
@@ -366,6 +452,7 @@ func TestImport(t *testing.T) {
 		{
 			Name: "OCI-IndexWithMissingManifestDescendants",
 			Writer: tartest.TarAll(
+<<<<<<< HEAD
 				tc.Dir("blobs", 0755),
 				tc.Dir("blobs/sha256", 0755),
 				tc.File("blobs/sha256/"+d1.Encoded(), b1, 0644),
@@ -374,6 +461,16 @@ func TestImport(t *testing.T) {
 				tc.File("blobs/sha256/"+d5.Encoded(), m2, 0644),
 				tc.File("index.json", createIndex(ml1, ocispec.MediaTypeImageIndex, "docker.io/library/sparse:ok"), 0644),
 				tc.File("blobs/sha256/"+d6.Encoded(), ml1, 0644),
+=======
+				tc.Dir(ocispec.ImageBlobsDir, 0755),
+				tc.Dir(ocispec.ImageBlobsDir+"/sha256", 0755),
+				tc.File(ocispec.ImageBlobsDir+"/sha256/"+d1.Encoded(), b1, 0644),
+				tc.File(ocispec.ImageBlobsDir+"/sha256/"+d2.Encoded(), c1, 0644),
+				tc.File(ocispec.ImageBlobsDir+"/sha256/"+d3.Encoded(), m1, 0644),
+				tc.File(ocispec.ImageBlobsDir+"/sha256/"+d5.Encoded(), m2, 0644),
+				tc.File(ocispec.ImageIndexFile, createIndex(ml1, ocispec.MediaTypeImageIndex, "docker.io/library/sparse:ok"), 0644),
+				tc.File(ocispec.ImageBlobsDir+"/sha256/"+d6.Encoded(), ml1, 0644),
+>>>>>>> v2.0.7
 				tc.File(ocispec.ImageLayoutFile, []byte(`{"imageLayoutVersion":"`+ocispec.ImageLayoutVersion+`"}`), 0644),
 			),
 			Check: func(ctx context.Context, t *testing.T, client *Client, imgs []images.Image) {
@@ -600,7 +697,7 @@ func TestTransferImport(t *testing.T) {
 		// [0]: Index name or ""
 		// [1:]: Additional images and manifest to import
 		//  Images ending with @ will have digest appended and use the digest of the previously imported image
-		//  A space can be used to seperate a repo name and tag, only the tag will be set in the imported image
+		//  A space can be used to separate a repo name and tag, only the tag will be set in the imported image
 		Images []string
 		Opts   []image.StoreOpt
 	}{
@@ -653,14 +750,14 @@ func TestTransferImport(t *testing.T) {
 		t.Run(testCase.Name, func(t *testing.T) {
 			tc := tartest.TarContext{}
 			files := []tartest.WriterToTar{
-				tc.Dir("blobs", 0755),
-				tc.Dir("blobs/sha256", 0755),
+				tc.Dir(ocispec.ImageBlobsDir, 0755),
+				tc.Dir(ocispec.ImageBlobsDir+"/sha256", 0755),
 			}
 
 			descs, tws := createImages(tc, testCase.Images...)
 			files = append(files, tws...)
 
-			files = append(files, tc.File("oci-layout", []byte(`{"imageLayoutVersion":"1.0.0"}`), 0644))
+			files = append(files, tc.File(ocispec.ImageLayoutFile, []byte(`{"imageLayoutVersion":"`+ocispec.ImageLayoutVersion+`"}`), 0644))
 
 			r := tartest.TarFromWriterTo(tartest.TarAll(files...))
 
@@ -752,13 +849,13 @@ func createImages(tc tartest.TarContext, imageNames ...string) (descs map[string
 			}
 			seed := hash64(image)
 			bb, b := createContent(128, seed)
-			tw = append(tw, tc.File("blobs/sha256/"+b.Encoded(), bb, 0644))
+			tw = append(tw, tc.File(ocispec.ImageBlobsDir+"/sha256/"+b.Encoded(), bb, 0644))
 
 			cb, c := createConfig("linux", "amd64", image)
-			tw = append(tw, tc.File("blobs/sha256/"+c.Encoded(), cb, 0644))
+			tw = append(tw, tc.File(ocispec.ImageBlobsDir+"/sha256/"+c.Encoded(), cb, 0644))
 
 			mb, m, _ := createManifest(cb, [][]byte{bb})
-			tw = append(tw, tc.File("blobs/sha256/"+m.Encoded(), mb, 0644))
+			tw = append(tw, tc.File(ocispec.ImageBlobsDir+"/sha256/"+m.Encoded(), mb, 0644))
 
 			annotations := map[string]string{}
 			if image != "" {
@@ -794,7 +891,7 @@ func createImages(tc tartest.TarContext, imageNames ...string) (descs map[string
 		Size:      int64(len(ib)),
 		MediaType: ocispec.MediaTypeImageIndex,
 	}
-	tw = append(tw, tc.File("index.json", ib, 0644))
+	tw = append(tw, tc.File(ocispec.ImageIndexFile, ib, 0644))
 
 	var idxName string
 	if len(imageNames) > 0 {

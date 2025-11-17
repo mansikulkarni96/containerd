@@ -1,13 +1,16 @@
 name: CI
 on:
-  push:
-    branches:
-      - main
-      - "release/**"
+  # When added to a merge queue.
+  # See https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue#triggering-merge-group-checks-with-github-actions
+  merge_group:
   pull_request:
+<<<<<<< HEAD
     branches:
       - main
       - "release/**"
+=======
+    branches: ['main', 'release/**']
+>>>>>>> v2.0.7
 
 permissions: # added using https://github.com/step-security/secure-workflows
   contents: read
@@ -29,13 +32,20 @@ jobs:
         os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest]
         exclude:
           - os: ${{ github.event.repository.private && 'ubuntu-24.04-arm' || '' }}
+<<<<<<< HEAD
+=======
+
+>>>>>>> v2.0.7
 
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: ./.github/actions/install-go
       - uses: golangci/golangci-lint-action@2226d7cb06a077cd73e56eedd38eecad18e5d837 # v6.5.0
         with:
+<<<<<<< HEAD
           only-new-issues: true
+=======
+>>>>>>> v2.0.7
           version: v1.64.2
           skip-cache: true
           args: --timeout=8m
@@ -188,7 +198,7 @@ jobs:
   binaries:
     name: Binaries
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 10
+    timeout-minutes: 20
     needs: [project, linters, protos, man]
 
     strategy:
@@ -222,7 +232,11 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-2022]
+<<<<<<< HEAD
         enable_cri_sandboxes: ["", "sandboxed"]
+=======
+        cgroup_driver: [cgroupfs]
+>>>>>>> v2.0.7
 
     defaults:
       run:
@@ -285,7 +299,7 @@ jobs:
         shell: powershell
         run: |
           # Get critctl tool. Used for cri-integration tests
-          $CRICTL_DOWNLOAD_URL="https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.21.0/crictl-v1.21.0-windows-amd64.tar.gz"
+          $CRICTL_DOWNLOAD_URL="https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.26.0/crictl-v1.26.0-windows-amd64.tar.gz"
           curl.exe -L $CRICTL_DOWNLOAD_URL -o c:\crictl.tar.gz
           tar -xvf c:\crictl.tar.gz
           mv crictl.exe "${{ github.workspace }}/bin/crictl.exe" # Move crictl somewhere in path
@@ -308,7 +322,6 @@ jobs:
       - name: Integration 1
         env:
           CGO_ENABLED: 1
-          ENABLE_CRI_SANDBOXES: ${{ matrix.enable_cri_sandboxes }}
           GOTESTSUM_JUNITFILE: ${{github.workspace}}/test-integration-serial-junit.xml
           GOTESTSUM_JSONFILE: ${{github.workspace}}/test-integration-serial-gotest.json
           EXTRA_TESTFLAGS: "-timeout=20m"
@@ -326,7 +339,6 @@ jobs:
           TESTFLAGS_PARALLEL: 1
           EXTRA_TESTFLAGS: "-short"
           CGO_ENABLED: 1
-          ENABLE_CRI_SANDBOXES: ${{ matrix.enable_cri_sandboxes }}
           GOTESTSUM_JUNITFILE: ${{github.workspace}}/test-integration-parallel-junit.xml
           GOTESTSUM_JSONFILE: ${{github.workspace}}/test-integration-parallel-gotest.json
         run: mingw32-make.exe integration
@@ -339,15 +351,15 @@ jobs:
 
       - name: CRI Integration Test
         env:
-          ENABLE_CRI_SANDBOXES: ${{ matrix.enable_cri_sandboxes }}
           TEST_IMAGE_LIST: ${{github.workspace}}/repolist.toml
+          CGROUP_DRIVER: ${{ matrix.cgroup_driver }}
         run: |
           make cri-integration
 
       - name: cri-tools critest
         env:
-          ENABLE_CRI_SANDBOXES: ${{ matrix.enable_cri_sandboxes }}
           CRI_TEST_IMAGES: ${{github.workspace}}/cri-test-images.yaml
+          CGROUP_DRIVER: ${{ matrix.cgroup_driver }}
         shell: powershell
         run: |
           Start-Process -FilePath containerd.exe -NoNewWindow -RedirectStandardError true -PassThru
@@ -364,7 +376,11 @@ jobs:
       - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
         if: always()
         with:
+<<<<<<< HEAD
           name: TestResults ${{ matrix.os }} ${{ matrix.enable_cri_sandboxes }}
+=======
+          name: TestResults ${{ matrix.os }} ${{ matrix.cgroup_driver }}
+>>>>>>> v2.0.7
           path: |
             ${{github.workspace}}/*-junit.xml
             ${{github.workspace}}/*-gotest.json
@@ -381,9 +397,15 @@ jobs:
       matrix:
         runtime:
           - io.containerd.runc.v2
+<<<<<<< HEAD
         runc: [runc, crun]
         enable_cri_sandboxes: ["", "sandboxed"]
         os: [ubuntu-24.04, ubuntu-24.04-arm]
+=======
+        runc: [runc]  # crun can be added here to debug crun issues
+        os: [ubuntu-22.04, ubuntu-24.04, ubuntu-24.04-arm]
+        cgroup_driver: [cgroupfs, systemd]
+>>>>>>> v2.0.7
         exclude:
           - os: ${{ github.event.repository.private && 'ubuntu-24.04-arm' || '' }}
 
@@ -405,8 +427,14 @@ jobs:
           script/setup/install-critools
           script/setup/install-failpoint-binaries
 
+<<<<<<< HEAD
       - name: Install criu
         if: matrix.os != 'ubuntu-24.04-arm'
+=======
+      # Disable criu testing on arm64 until we can solve the consistent failures of restore testing
+      - if: matrix.os != 'ubuntu-24.04-arm'
+        name: Install criu
+>>>>>>> v2.0.7
         run: |
           sudo add-apt-repository -y ppa:criu/ppa
           sudo apt-get update
@@ -437,7 +465,6 @@ jobs:
         env:
           TEST_RUNTIME: ${{ matrix.runtime }}
           RUNC_FLAVOR: ${{ matrix.runc }}
-          ENABLE_CRI_SANDBOXES: ${{ matrix.enable_cri_sandboxes }}
           GOTESTSUM_JUNITFILE: ${{github.workspace}}/test-integration-serial-junit.xml
           GOTESTSUM_JSONFILE: ${{github.workspace}}/test-integration-serial-gotest.json
         run: |
@@ -456,7 +483,6 @@ jobs:
         env:
           TEST_RUNTIME: ${{ matrix.runtime }}
           RUNC_FLAVOR: ${{ matrix.runc }}
-          ENABLE_CRI_SANDBOXES: ${{ matrix.enable_cri_sandboxes }}
           GOTESTSUM_JUNITFILE: ${{github.workspace}}/test-integration-parallel-junit.xml
           GOTESTSUM_JSONFILE: ${{github.workspace}}/test-integration-parallel-gotest.json
         run: |
@@ -473,14 +499,21 @@ jobs:
       - name: CRI Integration Test
         env:
           TEST_RUNTIME: ${{ matrix.runtime }}
-          ENABLE_CRI_SANDBOXES: ${{ matrix.enable_cri_sandboxes }}
+          CGROUP_DRIVER: ${{ matrix.cgroup_driver }}
+          RUNC_FLAVOR: ${{ matrix.runc }}
         run: |
+          cat /sys/fs/cgroup/cgroup.controllers
+          systemctl status
+          [ "${RUNC_FLAVOR}" == "crun" ] && {
+             export XDG_RUNTIME_DIR=/run/user/$(id -u)
+          }
+          runc --version
           CONTAINERD_RUNTIME=$TEST_RUNTIME make cri-integration
 
       - name: cri-tools critest
         env:
           TEST_RUNTIME: ${{ matrix.runtime }}
-          ENABLE_CRI_SANDBOXES: ${{ matrix.enable_cri_sandboxes }}
+          CGROUP_DRIVER: ${{ matrix.cgroup_driver }}
         run: |
           env
           sudo -E PATH=$PATH ./script/critest.sh "${{github.workspace}}/report"
@@ -494,7 +527,10 @@ jobs:
           mount
           df
           losetup -l
+<<<<<<< HEAD
 
+=======
+>>>>>>> v2.0.7
       - name: Kernel Message
         if: failure()
         run: |
@@ -504,7 +540,11 @@ jobs:
       - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
         if: always()
         with:
+<<<<<<< HEAD
           name: TestResults ${{ matrix.runtime }} ${{matrix.runc}} ${{ matrix.os }} ${{ matrix.enable_cri_sandboxes }}
+=======
+          name: TestResults ${{ matrix.runtime }} ${{matrix.runc}} ${{ matrix.os }} ${{ matrix.cgroup_driver }}
+>>>>>>> v2.0.7
           path: |
             *-junit.xml
             *-gotest.json
@@ -520,6 +560,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+<<<<<<< HEAD
         box:
           - fedora/43-cloud-base
           # We have to keep EL8 to test old glibc, cgroup, kernel, etc.
@@ -546,6 +587,41 @@ jobs:
       BOX: ${{ matrix.box }}
       RUNTIME: ${{ matrix.runtime }}
 
+=======
+        include:
+          - box: fedora/43-cloud-base
+            cgroup_driver: cgroupfs
+            runc: runc
+          - box: fedora/43-cloud-base
+            cgroup_driver: systemd
+            runc: runc
+          - box: fedora/43-cloud-base
+            cgroup_driver: cgroupfs
+            runc: crun
+          - box: fedora/43-cloud-base
+            cgroup_driver: systemd
+            runc: crun
+            # We have to keep EL8 to test old glibc, cgroup, kernel, etc.
+            # The image was changed from rockylinux/8 to almalinux/8,
+            # as the former one no longer works:
+            # https://github.com/containerd/containerd/pull/10297
+          - box: almalinux/8
+            cgroup_driver: cgroupfs
+            runc: runc
+          - box: almalinux/8
+            cgroup_driver: systemd
+            runc: runc
+          - box: almalinux/9
+            cgroup_driver: cgroupfs
+            runc: runc
+          - box: almalinux/9
+            cgroup_driver: systemd
+            runc: runc
+    env:
+      BOX: ${{ matrix.box }}
+      CGROUP_DRIVER: ${{ matrix.cgroup_driver }}
+      RUNC_FLAVOR: ${{ matrix.runc }}
+>>>>>>> v2.0.7
     steps:
       - name: Show the host info
         run: |
@@ -580,6 +656,7 @@ jobs:
             # fedora/41-cloud-base seems the last version available in https://portal.cloud.hashicorp.com/vagrant/discover/fedora
             sudo vagrant box add fedora/43-cloud-base https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Vagrant-libvirt-43-1.6.x86_64.vagrant.libvirt.box
           fi
+<<<<<<< HEAD
           sudo RUNC_RUNTIME=$RUNTIME BOX=$BOX vagrant up --no-tty
       - name: test-integration
         run: sudo RUNC_RUNTIME=$RUNTIME BOX=$BOX vagrant up --provision-with=selinux,install-runc,install-gotestsum,test-integration
@@ -587,6 +664,15 @@ jobs:
         run: sudo RUNC_RUNTIME=$RUNTIME BOX=$BOX vagrant up --provision-with=selinux,install-runc,install-gotestsum,test-cri-integration
       - name: test-cri
         run: sudo RUNC_RUNTIME=$RUNTIME BOX=$BOX vagrant up --provision-with=selinux,install-runc,install-gotestsum,test-cri
+=======
+          sudo BOX=$BOX RUNC_FLAVOR=$RUNC_FLAVOR vagrant up --no-tty
+      - name: test-integration
+        run: sudo BOX=$BOX RUNC_FLAVOR=$RUNC_FLAVOR vagrant up --provision-with=selinux,install-runc,install-gotestsum,test-integration
+      - name: test-cri-integration
+        run: sudo BOX=$BOX CGROUP_DRIVER=$CGROUP_DRIVER RUNC_FLAVOR=$RUNC_FLAVOR vagrant up --provision-with=selinux,install-runc,install-gotestsum,test-cri-integration
+      - name: test-cri
+        run: sudo BOX=$BOX CGROUP_DRIVER=$CGROUP_DRIVER RUNC_FLAVOR=$RUNC_FLAVOR vagrant up --provision-with=selinux,install-runc,install-gotestsum,test-cri
+>>>>>>> v2.0.7
 
   tests-cri-in-userns:
     name: "CRI-in-UserNS"
@@ -595,6 +681,14 @@ jobs:
     timeout-minutes: 40
     needs: [project, linters, protos, man]
 
+<<<<<<< HEAD
+=======
+    strategy:
+      fail-fast: false
+      matrix:
+        cgroup_driver: [cgroupfs, systemd]
+
+>>>>>>> v2.0.7
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Set up cgroup v2 delegation
@@ -606,11 +700,43 @@ jobs:
           EOF
           sudo systemctl daemon-reload
       - name: Build cri-in-userns image
+<<<<<<< HEAD
         run: podman build --target cri-in-userns -t cri-in-userns -f ./contrib/Dockerfile.test .
       - name: Run cri-in-userns image
         # Rootless Podman is used for testing CRI-in-UserNS
         # (We could use rootless Docker or rootless nerdctl, but we are using Podman here because it is preinstalled)
         run: podman run --rm --privileged cri-in-userns
+=======
+        env:
+          CGROUP_DRIVER: ${{ matrix.cgroup_driver }}
+        run: |
+          if [ "$CGROUP_DRIVER" = "systemd" ];then
+            podman build --target cri-in-userns-systemd -t cri-in-userns-systemd -f ./contrib/Dockerfile.test .
+          else
+            podman build --target cri-in-userns -t cri-in-userns -f ./contrib/Dockerfile.test .
+          fi
+
+      - name: Run cri-in-userns image
+        env:
+          CGROUP_DRIVER: ${{ matrix.cgroup_driver }}
+        # Rootless Podman is used for testing CRI-in-UserNS
+        # (We could use rootless Docker or rootless nerdctl, but we are using Podman here because it is preinstalled)
+        run: |
+          if [ "$CGROUP_DRIVER" = "systemd" ];then
+              set +e
+              touch ./critest_exit_code.txt
+              podman run --rm --privileged --group-add keep-groups -v ./critest_exit_code.txt:/tmp/critest_exit_code.txt cri-in-userns-systemd
+              exit_code=`cat ./critest_exit_code.txt`
+              echo "exit_code:"$exit_code
+              if [ "$exit_code" -gt 0 ]; then
+                exit 1
+              else
+                exit 0
+              fi
+          else
+            podman run --rm --privileged cri-in-userns
+          fi
+>>>>>>> v2.0.7
 
   tests-mac-os:
     name: MacOS unit tests
@@ -641,3 +767,20 @@ jobs:
           path: |
             *-junit.xml
             *-gotest.json
+
+  # Currently Github actions UI supports no masks to mark matrix jobs as required to pass status checks.
+  # This means that every time version of Go, containerd, or OS is changed, a corresponding job should
+  # be added to the list of required checks. Which is not very convenient.
+  # To workaround this, a special job is added to report statuses of all other jobs, with fixed title.
+  # So it needs to be added to the list of required checks only once.
+  #
+  # See https://github.com/orgs/community/discussions/26822
+  results:
+    name: Report required job statuses
+    runs-on: ubuntu-latest
+    # List job dependencies which are required to pass status checks in order to be merged via merge queue.
+    needs: [linters, project, protos, binaries, integration-linux, integration-windows, tests-cri-in-userns, tests-mac-os]
+    if: ${{ always() }}
+    steps:
+      - run: exit 1
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}

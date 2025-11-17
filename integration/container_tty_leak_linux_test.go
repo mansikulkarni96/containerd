@@ -20,18 +20,26 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+<<<<<<< HEAD
 	"net"
+=======
+>>>>>>> v2.0.7
 	"net/url"
 	"os/exec"
 	"strings"
 	"testing"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/containerd/containerd/api/runtime/task/v2"
 	"github.com/containerd/containerd/integration/images"
 	"github.com/containerd/containerd/namespaces"
 	"github.com/containerd/containerd/runtime/v2/shim"
 	"github.com/containerd/ttrpc"
+=======
+	"github.com/containerd/containerd/v2/integration/images"
+	"github.com/containerd/containerd/v2/pkg/namespaces"
+>>>>>>> v2.0.7
 	"github.com/stretchr/testify/require"
 	"k8s.io/client-go/rest"
 	remoteclient "k8s.io/client-go/tools/remotecommand"
@@ -39,6 +47,7 @@ import (
 )
 
 func TestContainerTTYLeakAfterExit(t *testing.T) {
+<<<<<<< HEAD
 	criCfg, err := CRIConfig()
 	require.NoError(t, err)
 
@@ -47,6 +56,8 @@ func TestContainerTTYLeakAfterExit(t *testing.T) {
 		t.Skip("skipping test for legacy runtime")
 	}
 
+=======
+>>>>>>> v2.0.7
 	t.Log("Create a sandbox")
 	sb, sbConfig := PodSandboxConfigWithCleanup(t, "sandbox", "container-tty-leak-after-exit")
 
@@ -132,7 +143,11 @@ func TestContainerTTYLeakAfterExit(t *testing.T) {
 
 func getShimPid(t *testing.T, sb string) int {
 	ctx := namespaces.WithNamespace(context.Background(), "k8s.io")
+<<<<<<< HEAD
 	shimCli := connectToShim(ctx, t, containerdEndpoint, sb)
+=======
+	shimCli := connectToShim(ctx, t, containerdEndpoint, 3, sb)
+>>>>>>> v2.0.7
 	return int(shimPid(ctx, t, shimCli))
 }
 
@@ -154,6 +169,7 @@ func checkTTY(t *testing.T, shimPid, expected int) {
 		return false, nil
 	}, time.Second, 30*time.Second))
 }
+<<<<<<< HEAD
 
 func connectToShim(ctx context.Context, t *testing.T, ctrdEndpoint string, id string) task.TaskService {
 	addr, err := shim.SocketAddress(ctx, ctrdEndpoint, id)
@@ -174,3 +190,5 @@ func shimPid(ctx context.Context, t *testing.T, shimCli task.TaskService) uint32
 	require.NoError(t, err)
 	return resp.ShimPid
 }
+=======
+>>>>>>> v2.0.7

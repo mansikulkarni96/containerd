@@ -24,7 +24,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"sync"
 	"syscall"
@@ -34,6 +33,7 @@ import (
 	"github.com/containerd/cgroups/v3"
 	"github.com/containerd/cgroups/v3/cgroup1"
 	cgroupsv2 "github.com/containerd/cgroups/v3/cgroup2"
+<<<<<<< HEAD
 
 	. "github.com/containerd/containerd"
 	"github.com/containerd/containerd/api/types/runc/options"
@@ -49,11 +49,30 @@ import (
 
 	"github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/stretchr/testify/assert"
+=======
+	"github.com/containerd/containerd/api/types/runc/options"
+	"github.com/containerd/errdefs"
+	"github.com/stretchr/testify/assert"
+
+	. "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/core/containers"
+	"github.com/containerd/containerd/v2/integration/failpoint"
+	"github.com/containerd/containerd/v2/integration/images"
+	"github.com/containerd/containerd/v2/pkg/cio"
+	"github.com/containerd/containerd/v2/pkg/fifosync"
+	"github.com/containerd/containerd/v2/pkg/oci"
+	"github.com/containerd/containerd/v2/pkg/shim"
+	"github.com/containerd/containerd/v2/pkg/sys"
+	"github.com/containerd/containerd/v2/plugins"
+
+	"github.com/opencontainers/runtime-spec/specs-go"
+>>>>>>> v2.0.7
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sys/unix"
 )
 
-const testUserNSImage = "ghcr.io/containerd/alpine:3.14.0"
+// We use this image for user ns tests because it has files with setuid bits
+var testUserNSImage = images.Get(images.VolumeOwnership)
 
 func TestTaskUpdate(t *testing.T) {
 	t.Parallel()
@@ -317,6 +336,67 @@ func TestShimDoesNotLeakPipes(t *testing.T) {
 	}
 }
 
+func TestShimDoesNotLeakSockets(t *testing.T) {
+	client, err := newClient(t, address)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer client.Close()
+
+	var (
+		image       Image
+		ctx, cancel = testContext(t)
+		id          = t.Name()
+	)
+	defer cancel()
+
+	image, err = client.GetImage(ctx, testImage)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	container, err := client.NewContainer(ctx, id, WithNewSnapshot(id, image), WithNewSpec(oci.WithImageConfig(image), withProcessArgs("sleep", "30")))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	task, err := container.NewTask(ctx, empty())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	exitChannel, err := task.Wait(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := task.Start(ctx); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := task.Kill(ctx, syscall.SIGKILL); err != nil {
+		t.Fatal(err)
+	}
+
+	<-exitChannel
+
+	if _, err := task.Delete(ctx); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := container.Delete(ctx, WithSnapshotCleanup); err != nil {
+		t.Fatal(err)
+	}
+
+	s, err := shim.SocketAddress(ctx, address, id, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = os.Stat(strings.TrimPrefix(s, "unix://")); err == nil || !os.IsNotExist(err) {
+		t.Errorf("Shim sockets have leaked after container has been deleted.")
+	}
+}
+
 func numPipes(pid int) (int, error) {
 	cmd := exec.Command("sh", "-c", fmt.Sprintf("lsof -p %d | grep FIFO", pid))
 
@@ -381,16 +461,9 @@ func TestDaemonReconnectsToShimIOPipesOnRestart(t *testing.T) {
 
 	// After we restarted containerd we write some messages to the log pipes, simulating shim writing stuff there.
 	// Then we make sure that these messages are available on the containerd log thus proving that the server reconnected to the log pipes
-	runtimeVersion := getRuntimeVersion()
-	logDirPath := getLogDirPath(runtimeVersion, id)
+	logDirPath := getLogDirPath("v2", id)
 
-	switch runtimeVersion {
-	case "v1":
-		writeToFile(t, filepath.Join(logDirPath, "shim.stdout.log"), fmt.Sprintf("%s writing to stdout\n", id))
-		writeToFile(t, filepath.Join(logDirPath, "shim.stderr.log"), fmt.Sprintf("%s writing to stderr\n", id))
-	case "v2":
-		writeToFile(t, filepath.Join(logDirPath, "log"), fmt.Sprintf("%s writing to log\n", id))
-	}
+	writeToFile(t, filepath.Join(logDirPath, "log"), fmt.Sprintf("%s writing to log\n", id))
 
 	statusC, err := task.Wait(ctx)
 	if err != nil {
@@ -408,18 +481,8 @@ func TestDaemonReconnectsToShimIOPipesOnRestart(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	switch runtimeVersion {
-	case "v1":
-		if !strings.Contains(string(stdioContents), fmt.Sprintf("%s writing to stdout", id)) {
-			t.Fatal("containerd did not connect to the shim stdout pipe")
-		}
-		if !strings.Contains(string(stdioContents), fmt.Sprintf("%s writing to stderr", id)) {
-			t.Fatal("containerd did not connect to the shim stderr pipe")
-		}
-	case "v2":
-		if !strings.Contains(string(stdioContents), fmt.Sprintf("%s writing to log", id)) {
-			t.Fatal("containerd did not connect to the shim log pipe")
-		}
+	if !strings.Contains(string(stdioContents), fmt.Sprintf("%s writing to log", id)) {
+		t.Fatal("containerd did not connect to the shim log pipe")
 	}
 }
 
@@ -438,8 +501,6 @@ func writeToFile(t *testing.T, filePath, message string) {
 
 func getLogDirPath(runtimeVersion, id string) string {
 	switch runtimeVersion {
-	case "v1":
-		return filepath.Join(defaultRoot, plugin.RuntimeLinuxV1, testNamespace, id)
 	case "v2":
 		return filepath.Join(defaultState, "io.containerd.runtime.v2.task", testNamespace, id)
 	default:
@@ -447,24 +508,8 @@ func getLogDirPath(runtimeVersion, id string) string {
 	}
 }
 
-func getRuntimeVersion() string {
-	switch rt := os.Getenv("TEST_RUNTIME"); rt {
-	case plugin.RuntimeLinuxV1:
-		return "v1"
-	default:
-		return "v2"
-	}
-}
-
 func TestContainerAttach(t *testing.T) {
 	t.Parallel()
-
-	if runtime.GOOS == "windows" {
-		// On windows, closing the write side of the pipe closes the read
-		// side, sending an EOF to it and preventing reopening it.
-		// Hence this test will always fails on windows
-		t.Skip("invalid logic on windows")
-	}
 
 	client, err := newClient(t, address)
 	if err != nil {
@@ -638,13 +683,6 @@ func testContainerUser(t *testing.T, userstr, expectedOutput string) {
 func TestContainerAttachProcess(t *testing.T) {
 	t.Parallel()
 
-	if runtime.GOOS == "windows" {
-		// On windows, closing the write side of the pipe closes the read
-		// side, sending an EOF to it and preventing reopening it.
-		// Hence this test will always fails on windows
-		t.Skip("invalid logic on windows")
-	}
-
 	client, err := newClient(t, address)
 	if err != nil {
 		t.Fatal(err)
@@ -761,13 +799,6 @@ func TestContainerAttachProcess(t *testing.T) {
 
 func TestContainerLoadUnexistingProcess(t *testing.T) {
 	t.Parallel()
-
-	if runtime.GOOS == "windows" {
-		// On windows, closing the write side of the pipe closes the read
-		// side, sending an EOF to it and preventing reopening it.
-		// Hence this test will always fails on windows
-		t.Skip("invalid logic on windows")
-	}
 
 	client, err := newClient(t, address)
 	if err != nil {
@@ -932,8 +963,7 @@ func TestContainerKillAll(t *testing.T) {
 	}
 	defer container.Delete(ctx, WithSnapshotCleanup)
 
-	stdout := bytes.NewBuffer(nil)
-	task, err := container.NewTask(ctx, cio.NewCreator(withByteBuffers(stdout)))
+	task, err := container.NewTask(ctx, cio.NullIO)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1037,49 +1067,6 @@ func TestDaemonRestartWithRunningShim(t *testing.T) {
 	}
 }
 
-func TestContainerRuntimeOptionsv1(t *testing.T) {
-	t.Parallel()
-
-	client, err := newClient(t, address)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer client.Close()
-
-	var (
-		image       Image
-		ctx, cancel = testContext(t)
-		id          = t.Name()
-	)
-	defer cancel()
-
-	image, err = client.GetImage(ctx, testImage)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	container, err := client.NewContainer(
-		ctx, id,
-		WithNewSnapshot(id, image),
-		WithNewSpec(oci.WithImageConfig(image), withExitStatus(7)),
-		WithRuntime(plugin.RuntimeLinuxV1, &runctypes.RuncOptions{Runtime: "no-runc"}),
-	)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer container.Delete(ctx, WithSnapshotCleanup)
-
-	task, err := container.NewTask(ctx, empty())
-	if err == nil {
-		t.Errorf("task creation should have failed")
-		task.Delete(ctx)
-		return
-	}
-	if !strings.Contains(err.Error(), `"no-runc"`) {
-		t.Errorf("task creation should have failed because of lack of executable. Instead failed with: %v", err.Error())
-	}
-}
-
 func TestContainerRuntimeOptionsv2(t *testing.T) {
 	t.Parallel()
 
@@ -1105,7 +1092,7 @@ func TestContainerRuntimeOptionsv2(t *testing.T) {
 		ctx, id,
 		WithNewSnapshot(id, image),
 		WithNewSpec(oci.WithImageConfig(image), withExitStatus(7)),
-		WithRuntime(plugin.RuntimeRuncV1, &options.Options{BinaryName: "no-runc"}),
+		WithRuntime(plugins.RuntimeRuncV2, &options.Options{BinaryName: "no-runc"}),
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -1121,6 +1108,19 @@ func TestContainerRuntimeOptionsv2(t *testing.T) {
 	if !strings.Contains(err.Error(), `"no-runc"`) {
 		t.Errorf("task creation should have failed because of lack of executable. Instead failed with: %v", err.Error())
 	}
+
+	// It doesn't matter what the NewTaskOpts function is. We are using an existing function in the client package,
+	// which will cause the TaskOptions in the new task request to be non-empty.
+	// https://github.com/containerd/containerd/issues/11568
+	task, err = container.NewTask(ctx, empty(), WithNoNewKeyring)
+	if err == nil {
+		t.Errorf("task creation should have failed")
+		task.Delete(ctx)
+		return
+	}
+	if !strings.Contains(err.Error(), `"no-runc"`) {
+		t.Errorf("task creation should have failed because of lack of executable. Instead failed with: %v", err.Error())
+	}
 }
 
 func TestContainerKillInitPidHost(t *testing.T) {
@@ -1128,9 +1128,61 @@ func TestContainerKillInitPidHost(t *testing.T) {
 }
 
 func TestUserNamespaces(t *testing.T) {
-	t.Run("WritableRootFS", func(t *testing.T) { testUserNamespaces(t, false) })
-	// see #1373 and runc#1572
-	t.Run("ReadonlyRootFS", func(t *testing.T) { testUserNamespaces(t, true) })
+	for name, test := range map[string]struct {
+		testCmd  oci.SpecOpts
+		roRootFS bool
+		exitCode uint32 // testUserNamespaces validates the exit code of the test container against this value
+		uidmaps  []specs.LinuxIDMapping
+		gidmaps  []specs.LinuxIDMapping
+	}{
+		"WritableRootFS": {
+			testCmd:  withExitStatus(7),
+			roRootFS: false,
+			exitCode: 7,
+			uidmaps:  []specs.LinuxIDMapping{{ContainerID: 0, HostID: 1000, Size: 65535}},
+			gidmaps:  []specs.LinuxIDMapping{{ContainerID: 0, HostID: 2000, Size: 65535}},
+		},
+		// see #1373 and runc#1572
+		"ReadonlyRootFS": {
+			testCmd:  withExitStatus(7),
+			roRootFS: true,
+			exitCode: 7,
+			uidmaps:  []specs.LinuxIDMapping{{ContainerID: 0, HostID: 1000, Size: 65535}},
+			gidmaps:  []specs.LinuxIDMapping{{ContainerID: 0, HostID: 2000, Size: 65535}},
+		},
+		"CheckSetUidBit": {
+			testCmd:  withProcessArgs("bash", "-c", "[ -u /usr/bin/passwd ] && exit 7"),
+			roRootFS: false,
+			exitCode: 7,
+			uidmaps:  []specs.LinuxIDMapping{{ContainerID: 0, HostID: 1000, Size: 65535}},
+			gidmaps:  []specs.LinuxIDMapping{{ContainerID: 0, HostID: 2000, Size: 65535}},
+		},
+		"WritableRootFSMultipleMap": {
+			testCmd:  withExitStatus(7),
+			roRootFS: false,
+			exitCode: 7,
+			uidmaps:  []specs.LinuxIDMapping{{ContainerID: 0, HostID: 0, Size: 10}, {ContainerID: 10, HostID: 1000, Size: 65535}},
+			gidmaps:  []specs.LinuxIDMapping{{ContainerID: 0, HostID: 0, Size: 20}, {ContainerID: 20, HostID: 2000, Size: 65535}},
+		},
+		"ReadonlyRootFSMultipleMap": {
+			testCmd:  withExitStatus(7),
+			roRootFS: true,
+			exitCode: 7,
+			uidmaps:  []specs.LinuxIDMapping{{ContainerID: 0, HostID: 0, Size: 20}, {ContainerID: 20, HostID: 2000, Size: 65535}},
+			gidmaps:  []specs.LinuxIDMapping{{ContainerID: 0, HostID: 0, Size: 20}, {ContainerID: 20, HostID: 2000, Size: 65535}},
+		},
+		"CheckSetUidBitMultipleMap": {
+			testCmd:  withProcessArgs("bash", "-c", "[ -u /usr/bin/passwd ] && exit 7"),
+			roRootFS: false,
+			exitCode: 7,
+			uidmaps:  []specs.LinuxIDMapping{{ContainerID: 0, HostID: 0, Size: 20}, {ContainerID: 20, HostID: 2000, Size: 65535}},
+			gidmaps:  []specs.LinuxIDMapping{{ContainerID: 0, HostID: 0, Size: 20}, {ContainerID: 20, HostID: 2000, Size: 65535}},
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			testUserNamespaces(t, test.uidmaps, test.gidmaps, test.testCmd, test.roRootFS, test.exitCode)
+		})
+	}
 }
 
 func checkUserNS(t *testing.T) {
@@ -1144,7 +1196,7 @@ func checkUserNS(t *testing.T) {
 	}
 }
 
-func testUserNamespaces(t *testing.T, readonlyRootFS bool) {
+func testUserNamespaces(t *testing.T, uidmaps, gidmaps []specs.LinuxIDMapping, cmdOpt oci.SpecOpts, readonlyRootFS bool, expected uint32) {
 	checkUserNS(t)
 
 	client, err := newClient(t, address)
@@ -1166,25 +1218,23 @@ func testUserNamespaces(t *testing.T, readonlyRootFS bool) {
 	}
 
 	opts := []NewContainerOpts{WithNewSpec(oci.WithImageConfig(image),
-		withExitStatus(7),
-		oci.WithUserNamespace([]specs.LinuxIDMapping{
-			{
-				ContainerID: 0,
-				HostID:      1000,
-				Size:        10000,
-			},
-		}, []specs.LinuxIDMapping{
-			{
-				ContainerID: 0,
-				HostID:      2000,
-				Size:        10000,
-			},
-		}),
+		cmdOpt,
+		oci.WithUserID(34), // run task as the "backup" user
+		oci.WithUserNamespace(uidmaps, gidmaps),
 	)}
+
 	if readonlyRootFS {
-		opts = append([]NewContainerOpts{WithRemappedSnapshotView(id, image, 1000, 2000)}, opts...)
+		if len(uidmaps) > 1 {
+			opts = append([]NewContainerOpts{WithUserNSRemappedSnapshotView(id, image, uidmaps, gidmaps)}, opts...)
+		} else {
+			opts = append([]NewContainerOpts{WithRemappedSnapshotView(id, image, 1000, 2000)}, opts...)
+		}
 	} else {
-		opts = append([]NewContainerOpts{WithRemappedSnapshot(id, image, 1000, 2000)}, opts...)
+		if len(uidmaps) > 1 {
+			opts = append([]NewContainerOpts{WithUserNSRemappedSnapshot(id, image, uidmaps, gidmaps)}, opts...)
+		} else {
+			opts = append([]NewContainerOpts{WithRemappedSnapshot(id, image, 1000, 2000)}, opts...)
+		}
 	}
 
 	container, err := client.NewContainer(ctx, id, opts...)
@@ -1193,17 +1243,9 @@ func testUserNamespaces(t *testing.T, readonlyRootFS bool) {
 	}
 	defer container.Delete(ctx, WithSnapshotCleanup)
 
-	var copts interface{}
-	if CheckRuntime(client.Runtime(), "io.containerd.runc") {
-		copts = &options.Options{
-			IoUid: 1000,
-			IoGid: 2000,
-		}
-	} else {
-		copts = &runctypes.CreateOptions{
-			IoUid: 1000,
-			IoGid: 2000,
-		}
+	copts := &options.Options{
+		IoUid: 1000,
+		IoGid: 2000,
 	}
 
 	task, err := container.NewTask(ctx, cio.NewCreator(cio.WithStdio), func(_ context.Context, client *Client, r *TaskInfo) error {
@@ -1233,15 +1275,15 @@ func testUserNamespaces(t *testing.T, readonlyRootFS bool) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if code != 7 {
-		t.Errorf("expected status 7 from wait but received %d", code)
+	if code != expected {
+		t.Errorf("expected status %d from wait but received %d", expected, code)
 	}
 	deleteStatus, err := task.Delete(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if ec := deleteStatus.ExitCode(); ec != 7 {
-		t.Errorf("expected status 7 from delete but received %d", ec)
+	if ec := deleteStatus.ExitCode(); ec != expected {
+		t.Errorf("expected status %d from delete but received %d", expected, ec)
 	}
 }
 
@@ -1511,11 +1553,16 @@ func TestShimOOMScore(t *testing.T) {
 // status after container.NewTask. It's used to simulate that the runc-init
 // might be killed by oom-kill.
 func TestIssue9103(t *testing.T) {
+<<<<<<< HEAD
 	if os.Getenv("RUNC_FLAVOR") == "crun" {
 		t.Skip("skip it when using crun")
 	}
 	if getRuntimeVersion() == "v1" {
 		t.Skip("skip it when using shim v1")
+=======
+	if f := os.Getenv("RUNC_FLAVOR"); f != "" && f != "runc" {
+		t.Skip("test requires runc")
+>>>>>>> v2.0.7
 	}
 
 	client, err := newClient(t, address)
@@ -1595,7 +1642,11 @@ func TestIssue9103(t *testing.T) {
 
 			status, err := task.Status(ctx)
 			require.NoError(t, err)
+<<<<<<< HEAD
 			require.Equal(t, status.Status, tc.expectedStatus)
+=======
+			require.Equal(t, tc.expectedStatus, status.Status)
+>>>>>>> v2.0.7
 		})
 	}
 }
@@ -1622,9 +1673,12 @@ func TestIssue10589(t *testing.T) {
 	if f := os.Getenv("RUNC_FLAVOR"); f != "" && f != "runc" {
 		t.Skip("test requires runc")
 	}
+<<<<<<< HEAD
 	if rt := os.Getenv("TEST_RUNTIME"); rt != "" && rt != plugin.RuntimeRuncV2 {
 		t.Skip("test requires io.containerd.runc.v2")
 	}
+=======
+>>>>>>> v2.0.7
 
 	client, err := newClient(t, address)
 	require.NoError(t, err)

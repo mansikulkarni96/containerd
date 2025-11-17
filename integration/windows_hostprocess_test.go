@@ -26,7 +26,7 @@ import (
 	"time"
 
 	"github.com/Microsoft/hcsshim/osversion"
-	"github.com/containerd/containerd/integration/images"
+	"github.com/containerd/containerd/v2/integration/images"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sys/windows/registry"
@@ -127,7 +127,11 @@ func runHostProcess(t *testing.T, expectErr bool, image string, action hpcAction
 	action(t, cn, containerConfig)
 }
 
+<<<<<<< HEAD
 func runAndRemoveContainer(t *testing.T, sb string, sbConfig *runtime.PodSandboxConfig, cnConfig *runtime.ContainerConfig) {
+=======
+func runExecAndRemoveContainer(t *testing.T, sb string, sbConfig *runtime.PodSandboxConfig, cnConfig *runtime.ContainerConfig) {
+>>>>>>> v2.0.7
 	t.Log("Create the container")
 	cn, err := runtimeService.CreateContainer(sb, cnConfig, sbConfig)
 	require.NoError(t, err)
@@ -135,6 +139,16 @@ func runAndRemoveContainer(t *testing.T, sb string, sbConfig *runtime.PodSandbox
 	require.NoError(t, runtimeService.StartContainer(cn))
 	// Wait few seconds for the container to be completely initialized
 	time.Sleep(5 * time.Second)
+<<<<<<< HEAD
+=======
+
+	cmd := []string{"cmd", "/c", "echo", "hello"}
+	timeoutDuration := 10 * time.Second
+	stdout, _, err := runtimeService.ExecSync(cn, cmd, timeoutDuration)
+	require.NoError(t, err)
+	t.Logf("Exec response: %v", stdout)
+	require.Equal(t, "hello\r\n", string(stdout))
+>>>>>>> v2.0.7
 
 	t.Log("Stop the container")
 	require.NoError(t, runtimeService.StopContainer(cn, 0))
@@ -187,6 +201,11 @@ func TestArgsEscapedImagesOnWindows(t *testing.T) {
 		localSystemUsername,
 	)
 
+<<<<<<< HEAD
 	runAndRemoveContainer(t, sb, sbConfig, cnConfigWithCtrCmd)
 	runAndRemoveContainer(t, sb, sbConfig, cnConfigNoCtrCmd)
+=======
+	runExecAndRemoveContainer(t, sb, sbConfig, cnConfigWithCtrCmd)
+	runExecAndRemoveContainer(t, sb, sbConfig, cnConfigNoCtrCmd)
+>>>>>>> v2.0.7
 }
