@@ -51,7 +51,6 @@ import (
 
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/containerd/v2/core/metadata"
-	"github.com/containerd/containerd/v2/pkg/deprecation"
 	"github.com/containerd/containerd/v2/pkg/epoch"
 	"github.com/containerd/containerd/v2/pkg/gc"
 	"github.com/containerd/containerd/v2/pkg/oci"
@@ -176,6 +175,7 @@ func (l *local) Create(ctx context.Context, req *imagesapi.CreateImageRequest, _
 
 	resp.Image = imageToProto(&created)
 
+<<<<<<< HEAD
 <<<<<<< HEAD:services/images/local.go
 	if err := l.publisher.Publish(ctx, "/images/create", &eventstypes.ImageCreate{
 		Name:   resp.Image.Name,
@@ -187,8 +187,9 @@ func (l *local) Create(ctx context.Context, req *imagesapi.CreateImageRequest, _
 =======
 >>>>>>> v2.0.7:plugins/services/images/local.go
 	l.emitSchema1DeprecationWarning(ctx, &image)
+=======
+>>>>>>> v2.1.0
 	return &resp, nil
-
 }
 
 func (l *local) Update(ctx context.Context, req *imagesapi.UpdateImageRequest, _ ...grpc.CallOption) (*imagesapi.UpdateImageResponse, error) {
@@ -218,6 +219,7 @@ func (l *local) Update(ctx context.Context, req *imagesapi.UpdateImageRequest, _
 
 	resp.Image = imageToProto(&updated)
 
+<<<<<<< HEAD
 <<<<<<< HEAD:services/images/local.go
 	if err := l.publisher.Publish(ctx, "/images/update", &eventstypes.ImageUpdate{
 		Name:   resp.Image.Name,
@@ -229,6 +231,8 @@ func (l *local) Update(ctx context.Context, req *imagesapi.UpdateImageRequest, _
 =======
 >>>>>>> v2.0.7:plugins/services/images/local.go
 	l.emitSchema1DeprecationWarning(ctx, &image)
+=======
+>>>>>>> v2.1.0
 	return &resp, nil
 }
 
@@ -254,6 +258,7 @@ func (l *local) Delete(ctx context.Context, req *imagesapi.DeleteImageRequest, _
 
 	return empty, nil
 }
+<<<<<<< HEAD
 
 func (l *local) emitSchema1DeprecationWarning(ctx context.Context, image *images.Image) {
 	if image == nil {
@@ -278,3 +283,5 @@ func (l *local) emitSchema1DeprecationWarning(ctx context.Context, image *images
 	log.G(ctx).WithField("name", image.Name).WithField("schema1digest", dgst).Warn("conversion from schema 1 images is deprecated")
 	l.warnings.Emit(ctx, deprecation.PullSchema1Image)
 }
+=======
+>>>>>>> v2.1.0

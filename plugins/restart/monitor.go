@@ -130,7 +130,6 @@ func (m *monitor) reconcile(ctx context.Context) error {
 	}
 	var wgNSLoop sync.WaitGroup
 	for _, name := range ns {
-		name := name
 		wgNSLoop.Add(1)
 		go func() {
 			defer wgNSLoop.Done()
@@ -142,7 +141,6 @@ func (m *monitor) reconcile(ctx context.Context) error {
 			}
 			var wgChangesLoop sync.WaitGroup
 			for _, c := range changes {
-				c := c
 				wgChangesLoop.Add(1)
 				go func() {
 					defer wgChangesLoop.Done()

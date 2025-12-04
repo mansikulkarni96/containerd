@@ -20,8 +20,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	goruntime "runtime"
-	"strings"
 	"testing"
 	"time"
 
@@ -35,7 +33,6 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/integration/images"
 	"github.com/containerd/containerd/v2/internal/cri/labels"
-	"github.com/containerd/containerd/v2/pkg/deprecation"
 	"github.com/containerd/containerd/v2/pkg/namespaces"
 	"github.com/containerd/errdefs"
 >>>>>>> v2.0.7
@@ -283,6 +280,7 @@ func TestContainerdSandboxImagePulledOutsideCRI(t *testing.T) {
 	t.Log("ensure correct labels are set on pause image")
 	assert.Equal(t, "pinned", pauseImg.Labels()["io.cri-containerd.pinned"])
 }
+<<<<<<< HEAD
 
 func TestContainerdImageWithDockerSchema1(t *testing.T) {
 <<<<<<< HEAD
@@ -325,3 +323,5 @@ func TestContainerdImageWithDockerSchema1(t *testing.T) {
 	t.Logf("the image should be marked as dokcker schema1 with its original digest")
 	assert.Equal(t, digest, imgByRef.Labels()["io.containerd.image/converted-docker-schema1"])
 }
+=======
+>>>>>>> v2.1.0

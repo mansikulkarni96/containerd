@@ -18,7 +18,25 @@
 // Package internal contains code internal to the pickfirst package.
 package internal
 
+<<<<<<< HEAD
 import "math/rand"
 
 // RandShuffle pseudo-randomizes the order of addresses.
 var RandShuffle = rand.Shuffle
+=======
+import (
+	rand "math/rand/v2"
+	"time"
+)
+
+var (
+	// RandShuffle pseudo-randomizes the order of addresses.
+	RandShuffle = rand.Shuffle
+	// TimeAfterFunc allows mocking the timer for testing connection delay
+	// related functionality.
+	TimeAfterFunc = func(d time.Duration, f func()) func() {
+		timer := time.AfterFunc(d, f)
+		return func() { timer.Stop() }
+	}
+)
+>>>>>>> v2.1.0

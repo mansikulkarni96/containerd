@@ -21,9 +21,15 @@ const (
 // This follows recommendations in RFC 7636.
 //
 // A fresh verifier should be generated for each authorization.
+<<<<<<< HEAD
 // The resulting verifier should be passed to [Config.AuthCodeURL] or [Config.DeviceAuth]
 // with [S256ChallengeOption], and to [Config.Exchange] or [Config.DeviceAccessToken]
 // with [VerifierOption].
+=======
+// S256ChallengeOption(verifier) should then be passed to Config.AuthCodeURL
+// (or Config.DeviceAuth) and VerifierOption(verifier) to Config.Exchange
+// (or Config.DeviceAccessToken).
+>>>>>>> v2.1.0
 func GenerateVerifier() string {
 	// "RECOMMENDED that the output of a suitable random number generator be
 	// used to create a 32-octet sequence.  The octet sequence is then
@@ -52,7 +58,11 @@ func S256ChallengeFromVerifier(verifier string) string {
 }
 
 // S256ChallengeOption derives a PKCE code challenge derived from verifier with
+<<<<<<< HEAD
 // method S256. It should be passed to [Config.AuthCodeURL] or [Config.DeviceAuth]
+=======
+// method S256. It should be passed to Config.AuthCodeURL or Config.DeviceAuth
+>>>>>>> v2.1.0
 // only.
 func S256ChallengeOption(verifier string) AuthCodeOption {
 	return challengeOption{

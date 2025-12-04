@@ -37,11 +37,15 @@ type ImageList struct {
 	VolumeCopyUp     string
 	VolumeOwnership  string
 	ArgsEscaped      string
+<<<<<<< HEAD
 	DockerSchema1    string
 <<<<<<< HEAD
 =======
 	Nginx            string
 >>>>>>> v2.0.7
+=======
+	Nginx            string
+>>>>>>> v2.1.0
 }
 
 var (
@@ -60,11 +64,15 @@ func initImages(imageListFile string) {
 		VolumeCopyUp:     "ghcr.io/containerd/volume-copy-up:2.2",
 		VolumeOwnership:  "ghcr.io/containerd/volume-ownership:2.1",
 		ArgsEscaped:      "cplatpublic.azurecr.io/args-escaped-test-image-ns:1.0",
+<<<<<<< HEAD
 		DockerSchema1:    "registry.k8s.io/busybox@sha256:4bdd623e848417d96127e16037743f0cd8b528c026e9175e22a84f639eca58ff",
 <<<<<<< HEAD
 =======
 		Nginx:            "ghcr.io/containerd/nginx:1.27.0",
 >>>>>>> v2.0.7
+=======
+		Nginx:            "ghcr.io/containerd/nginx:1.27.0",
+>>>>>>> v2.1.0
 	}
 
 	if imageListFile != "" {
@@ -102,6 +110,7 @@ const (
 	VolumeOwnership
 	// ArgsEscaped tests image for ArgsEscaped windows bug
 	ArgsEscaped
+<<<<<<< HEAD
 	// DockerSchema1 image with docker schema 1
 	DockerSchema1
 <<<<<<< HEAD
@@ -109,6 +118,10 @@ const (
 	// Nginx image
 	Nginx
 >>>>>>> v2.0.7
+=======
+	// Nginx image
+	Nginx
+>>>>>>> v2.1.0
 )
 
 func initImageMap(imageList ImageList) map[int]string {
@@ -120,11 +133,15 @@ func initImageMap(imageList ImageList) map[int]string {
 	images[VolumeCopyUp] = imageList.VolumeCopyUp
 	images[VolumeOwnership] = imageList.VolumeOwnership
 	images[ArgsEscaped] = imageList.ArgsEscaped
+<<<<<<< HEAD
 	images[DockerSchema1] = imageList.DockerSchema1
 <<<<<<< HEAD
 =======
 	images[Nginx] = imageList.Nginx
 >>>>>>> v2.0.7
+=======
+	images[Nginx] = imageList.Nginx
+>>>>>>> v2.1.0
 	return images
 }
 

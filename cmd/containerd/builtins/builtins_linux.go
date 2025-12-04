@@ -28,8 +28,10 @@ import (
 =======
 	_ "github.com/containerd/containerd/v2/core/metrics/cgroups"
 	_ "github.com/containerd/containerd/v2/core/metrics/cgroups/v2"
+	_ "github.com/containerd/containerd/v2/plugins/diff/erofs/plugin"
 	_ "github.com/containerd/containerd/v2/plugins/diff/walking/plugin"
 	_ "github.com/containerd/containerd/v2/plugins/snapshots/blockfile/plugin"
+	_ "github.com/containerd/containerd/v2/plugins/snapshots/erofs/plugin"
 	_ "github.com/containerd/containerd/v2/plugins/snapshots/native/plugin"
 	_ "github.com/containerd/containerd/v2/plugins/snapshots/overlay/plugin"
 >>>>>>> v2.0.7

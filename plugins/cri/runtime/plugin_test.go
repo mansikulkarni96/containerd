@@ -28,6 +28,10 @@ import (
 
 func TestCRIRuntimePluginConfigMigration(t *testing.T) {
 	runcSandboxer := "podsandbox"
+<<<<<<< HEAD
+=======
+	cniBinDir := "/opt/cni/bin"
+>>>>>>> v2.1.0
 
 	grpcCri := map[string]interface{}{
 		"enable_selinux":              true,
@@ -41,6 +45,12 @@ func TestCRIRuntimePluginConfigMigration(t *testing.T) {
 				},
 			},
 		},
+<<<<<<< HEAD
+=======
+		"cni": map[string]interface{}{
+			"bin_dir": cniBinDir,
+		},
+>>>>>>> v2.1.0
 	}
 
 	pluginConfigs := map[string]interface{}{
@@ -66,4 +76,15 @@ func TestCRIRuntimePluginConfigMigration(t *testing.T) {
 	require.NotNil(t, runc)
 	assert.Equal(t, runcSandboxer, runc["sandboxer"])
 	assert.NotContains(t, runc, "sandbox_mode")
+<<<<<<< HEAD
+=======
+
+	cni, ok := runtimeConf["cni"].(map[string]interface{})
+	require.True(t, ok)
+	require.NotNil(t, cni)
+	cniBinDirs, ok := cni["bin_dirs"].([]string)
+	require.True(t, ok)
+	require.Len(t, cniBinDirs, 1)
+	require.Equal(t, cniBinDir, cniBinDirs[0])
+>>>>>>> v2.1.0
 }

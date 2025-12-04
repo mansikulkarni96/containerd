@@ -429,6 +429,7 @@ func TestIssue10598(t *testing.T) {
 	}, time.Second, 30*time.Second))
 }
 
+<<<<<<< HEAD
 // TestUsernsVolumeCopyUp tests the volume-copy-up feature in user namespaces. It's inspired in
 // TestVolumeCopyUp but adapted to run with user namespaces and check file owners.
 // For more info, see:
@@ -562,6 +563,8 @@ func TestUsernsVolumeCopyUp(t *testing.T) {
 	assert.Equal(t, "new_content\n", string(contents))
 }
 
+=======
+>>>>>>> v2.1.0
 func supportsRuncIDMap() error {
 	var r runc.Runc
 	features, err := r.Features(context.Background())

@@ -52,6 +52,7 @@ type upgradeVerifyCaseFunc func(*testing.T, cri.RuntimeService, cri.ImageManager
 // beforeUpgradeHookFunc is a hook before upgrade.
 type beforeUpgradeHookFunc func(*testing.T)
 
+<<<<<<< HEAD
 // setupUpgradeVerifyCase returns a list of upgradeVerifyCaseFunc.
 //
 // Each upgradeVerifyCaseFunc is used to verify the behavior after restarting
@@ -61,6 +62,13 @@ type setupUpgradeVerifyCase func(*testing.T, int, cri.RuntimeService, cri.ImageM
 // TODO: Support Windows
 func TestUpgrade(t *testing.T) {
 	for _, version := range []string{"1.7"} {
+=======
+type setupUpgradeVerifyCase func(*testing.T, int, cri.RuntimeService, cri.ImageManagerService) (upgradeVerifyCaseFunc, beforeUpgradeHookFunc)
+
+// TODO: Support Windows
+func TestUpgrade(t *testing.T) {
+	for _, version := range []string{"1.7", "2.0"} {
+>>>>>>> v2.1.0
 		t.Run(version, func(t *testing.T) {
 			previousReleaseBinDir := t.TempDir()
 			downloadPreviousLatestReleaseBinary(t, version, previousReleaseBinDir)
@@ -74,9 +82,12 @@ func TestUpgrade(t *testing.T) {
 			if version == "1.7" {
 				t.Run("recover-ungroupable-shim", runUpgradeTestCaseWithExistingConfig(version,
 					previousReleaseBinDir, true, shouldManipulateContainersInPodAfterUpgrade("runcv1")))
+<<<<<<< HEAD
 
 				t.Run("should-address-shim-version-mismatches",
 					runUpgradeTestCase(version, previousReleaseBinDir, shouldAdjustShimVersionDuringRestarting))
+=======
+>>>>>>> v2.1.0
 			}
 		})
 	}
@@ -85,7 +96,11 @@ func TestUpgrade(t *testing.T) {
 func runUpgradeTestCase(
 	previousVersion string,
 	previousReleaseBinDir string,
+<<<<<<< HEAD
 	setupUpgradeVerifyCase func(*testing.T, int, cri.RuntimeService, cri.ImageManagerService) ([]upgradeVerifyCaseFunc, beforeUpgradeHookFunc),
+=======
+	setupUpgradeVerifyCase func(*testing.T, int, cri.RuntimeService, cri.ImageManagerService) (upgradeVerifyCaseFunc, beforeUpgradeHookFunc),
+>>>>>>> v2.1.0
 ) func(t *testing.T) {
 	return runUpgradeTestCaseWithExistingConfig(
 		previousVersion,
@@ -101,7 +116,11 @@ func runUpgradeTestCaseWithExistingConfig(
 	previousVersion string,
 	previousReleaseBinDir string,
 	usingExistingConfig bool,
+<<<<<<< HEAD
 	setupUpgradeVerifyCase func(*testing.T, int, cri.RuntimeService, cri.ImageManagerService) ([]upgradeVerifyCaseFunc, beforeUpgradeHookFunc),
+=======
+	setupUpgradeVerifyCase func(*testing.T, int, cri.RuntimeService, cri.ImageManagerService) (upgradeVerifyCaseFunc, beforeUpgradeHookFunc),
+>>>>>>> v2.1.0
 ) func(t *testing.T) {
 	return func(t *testing.T) {
 		// NOTE: Using t.TempDir() here is to ensure there are no leaky
@@ -138,7 +157,11 @@ func runUpgradeTestCaseWithExistingConfig(
 		})
 
 		t.Log("Prepare pods for current release")
+<<<<<<< HEAD
 		upgradeCaseFuncs, hookFunc := setupUpgradeVerifyCase(t, taskVersion, previousProc.criRuntimeService(t), previousProc.criImageService(t))
+=======
+		upgradeCaseFunc, hookFunc := setupUpgradeVerifyCase(t, taskVersion, previousProc.criRuntimeService(t), previousProc.criImageService(t))
+>>>>>>> v2.1.0
 		needToCleanup = false
 
 		t.Log("Gracefully stop previous release's containerd process")
@@ -184,6 +207,7 @@ func runUpgradeTestCaseWithExistingConfig(
 	}
 }
 
+<<<<<<< HEAD
 // shouldAdjustShimVersionDuringRestarting verifies that the shim manager
 // can handle shim proto version mismatches during a containerd restart.
 //
@@ -247,6 +271,10 @@ func shouldAdjustShimVersionDuringRestarting(t *testing.T, _ int,
 
 func shouldRecoverAllThePodsAfterUpgrade(t *testing.T, taskVersion int,
 	rSvc cri.RuntimeService, iSvc cri.ImageManagerService) ([]upgradeVerifyCaseFunc, beforeUpgradeHookFunc) {
+=======
+func shouldRecoverAllThePodsAfterUpgrade(t *testing.T, taskVersion int,
+	rSvc cri.RuntimeService, iSvc cri.ImageManagerService) (upgradeVerifyCaseFunc, beforeUpgradeHookFunc) {
+>>>>>>> v2.1.0
 
 	var busyboxImage = images.Get(images.BusyBox)
 
@@ -336,7 +364,11 @@ func shouldRecoverAllThePodsAfterUpgrade(t *testing.T, taskVersion int,
 }
 
 func execToExistingContainer(t *testing.T, _ int,
+<<<<<<< HEAD
 	rSvc cri.RuntimeService, iSvc cri.ImageManagerService) ([]upgradeVerifyCaseFunc, beforeUpgradeHookFunc) {
+=======
+	rSvc cri.RuntimeService, iSvc cri.ImageManagerService) (upgradeVerifyCaseFunc, beforeUpgradeHookFunc) {
+>>>>>>> v2.1.0
 
 	var busyboxImage = images.Get(images.BusyBox)
 
@@ -402,6 +434,7 @@ func getFileSize(t *testing.T, filePath string) int64 {
 }
 
 func shouldManipulateContainersInPodAfterUpgrade(runtimeHandler string) setupUpgradeVerifyCase {
+<<<<<<< HEAD
 	return func(t *testing.T, taskVersion int, rSvc cri.RuntimeService, iSvc cri.ImageManagerService) ([]upgradeVerifyCaseFunc, beforeUpgradeHookFunc) {
 		shimConns := []shimConn{}
 
@@ -422,11 +455,32 @@ func shouldManipulateContainersInPodAfterUpgrade(runtimeHandler string) setupUpg
 			criruntime.ContainerState_CONTAINER_CREATED,
 			WithCommand("sleep", "1d"))
 
+=======
+	return func(t *testing.T, _ int, rSvc cri.RuntimeService, iSvc cri.ImageManagerService) (upgradeVerifyCaseFunc, beforeUpgradeHookFunc) {
+		var busyboxImage = images.Get(images.BusyBox)
+
+		pullImagesByCRI(t, iSvc, busyboxImage)
+
+		podCtx := newPodTCtxWithRuntimeHandler(t, rSvc, "running-pod", "sandbox", runtimeHandler)
+
+		cntr1 := podCtx.createContainer("running", busyboxImage,
+			criruntime.ContainerState_CONTAINER_RUNNING,
+			WithCommand("sleep", "1d"))
+
+		cntr2 := podCtx.createContainer("created", busyboxImage,
+			criruntime.ContainerState_CONTAINER_CREATED,
+			WithCommand("sleep", "1d"))
+
+>>>>>>> v2.1.0
 		cntr3 := podCtx.createContainer("stopped", busyboxImage,
 			criruntime.ContainerState_CONTAINER_EXITED,
 			WithCommand("sleep", "1d"))
 
+<<<<<<< HEAD
 		verifyFunc := func(t *testing.T, rSvc cri.RuntimeService, _ cri.ImageManagerService) {
+=======
+		return func(t *testing.T, rSvc cri.RuntimeService, _ cri.ImageManagerService) {
+>>>>>>> v2.1.0
 			// TODO(fuweid): make svc re-connect to new socket
 			podCtx.rSvc = rSvc
 
@@ -462,9 +516,12 @@ func shouldManipulateContainersInPodAfterUpgrade(runtimeHandler string) setupUpg
 			require.NoError(t, rSvc.StartContainer(cntr2))
 			checkContainerState(t, rSvc, cntr2, criruntime.ContainerState_CONTAINER_RUNNING)
 
+<<<<<<< HEAD
 			t.Logf("Building shim connect for container %s", cntr2)
 			shimConns = append(shimConns, buildShimClientFromBundle(t, rSvc, cntr2))
 
+=======
+>>>>>>> v2.1.0
 			t.Logf("Stopping running container %s", cntr2)
 			require.NoError(t, rSvc.StopContainer(cntr2, 0))
 			checkContainerState(t, rSvc, cntr2, criruntime.ContainerState_CONTAINER_EXITED)
@@ -483,6 +540,7 @@ func shouldManipulateContainersInPodAfterUpgrade(runtimeHandler string) setupUpg
 			require.True(t, os.IsNotExist(err))
 
 			// Create a new container in the previous pod, start, stop, and remove it
+<<<<<<< HEAD
 			cntr4 := podCtx.createContainer("runinpreviouspod", busyboxImage,
 				criruntime.ContainerState_CONTAINER_RUNNING,
 				WithCommand("sleep", "1d"))
@@ -490,6 +548,12 @@ func shouldManipulateContainersInPodAfterUpgrade(runtimeHandler string) setupUpg
 			t.Logf("Building shim connect for container %s", cntr4)
 			shimConns = append(shimConns, buildShimClientFromBundle(t, rSvc, cntr4))
 
+=======
+			podCtx.createContainer("runinpreviouspod", busyboxImage,
+				criruntime.ContainerState_CONTAINER_EXITED,
+				WithCommand("sleep", "1d"))
+
+>>>>>>> v2.1.0
 			podCtx.stop(true)
 			podDataDir := podCtx.dataDir()
 
@@ -505,6 +569,7 @@ func shouldManipulateContainersInPodAfterUpgrade(runtimeHandler string) setupUpg
 
 			t.Log("Creating new running container in new pod")
 			pod2Ctx := newPodTCtxWithRuntimeHandler(t, rSvc, "running-pod-2", "sandbox", runtimeHandler)
+<<<<<<< HEAD
 			pod2Cntr := pod2Ctx.createContainer("running", busyboxImage,
 				criruntime.ContainerState_CONTAINER_RUNNING,
 				WithCommand("sleep", "1d"))
@@ -522,11 +587,22 @@ func shouldManipulateContainersInPodAfterUpgrade(runtimeHandler string) setupUpg
 			}
 		}
 		return []upgradeVerifyCaseFunc{verifyFunc}, nil
+=======
+			pod2Ctx.createContainer("running", busyboxImage,
+				criruntime.ContainerState_CONTAINER_RUNNING,
+				WithCommand("sleep", "1d"))
+
+		}, nil
+>>>>>>> v2.1.0
 	}
 }
 
 func shouldRecoverExistingImages(t *testing.T, _ int,
+<<<<<<< HEAD
 	_ cri.RuntimeService, iSvc cri.ImageManagerService) ([]upgradeVerifyCaseFunc, beforeUpgradeHookFunc) {
+=======
+	_ cri.RuntimeService, iSvc cri.ImageManagerService) (upgradeVerifyCaseFunc, beforeUpgradeHookFunc) {
+>>>>>>> v2.1.0
 
 	images := []string{images.Get(images.BusyBox), images.Get(images.Alpine)}
 	expectedRefs := pullImagesByCRI(t, iSvc, images...)
@@ -550,7 +626,11 @@ func shouldRecoverExistingImages(t *testing.T, _ int,
 // shouldParseMetricDataCorrectly is to check new release containerd can parse
 // metric data from existing shim created by previous release.
 func shouldParseMetricDataCorrectly(t *testing.T, _ int,
+<<<<<<< HEAD
 	rSvc cri.RuntimeService, iSvc cri.ImageManagerService) ([]upgradeVerifyCaseFunc, beforeUpgradeHookFunc) {
+=======
+	rSvc cri.RuntimeService, iSvc cri.ImageManagerService) (upgradeVerifyCaseFunc, beforeUpgradeHookFunc) {
+>>>>>>> v2.1.0
 
 	imageName := images.Get(images.BusyBox)
 	pullImagesByCRI(t, iSvc, imageName)
@@ -772,6 +852,15 @@ func (pCtx *podTCtx) dataDir() string {
 	cfg := criRuntimeInfo(t, pCtx.rSvc)
 	rootDir := cfg["rootDir"].(string)
 	return filepath.Join(rootDir, "sandboxes", pCtx.id)
+}
+
+// imageVolumeDir returns the image volume directory for this pod.
+func (pCtx *podTCtx) imageVolumeDir() string {
+	t := pCtx.t
+
+	cfg := criRuntimeInfo(t, pCtx.rSvc)
+	stateDir := cfg["stateDir"].(string)
+	return filepath.Join(stateDir, "image-volumes", pCtx.id)
 }
 
 // stop stops that pod.

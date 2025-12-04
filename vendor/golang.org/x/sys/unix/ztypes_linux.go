@@ -3805,6 +3805,7 @@ const (
 	ETHTOOL_MSG_PSE_GET                       = 0x24
 	ETHTOOL_MSG_PSE_SET                       = 0x25
 	ETHTOOL_MSG_RSS_GET                       = 0x26
+<<<<<<< HEAD
 	ETHTOOL_MSG_PLCA_GET_CFG                  = 0x27
 	ETHTOOL_MSG_PLCA_SET_CFG                  = 0x28
 	ETHTOOL_MSG_PLCA_GET_STATUS               = 0x29
@@ -3815,6 +3816,9 @@ const (
 	ETHTOOL_MSG_TSCONFIG_GET                  = 0x2e
 	ETHTOOL_MSG_TSCONFIG_SET                  = 0x2f
 	ETHTOOL_MSG_USER_MAX                      = 0x2f
+=======
+	ETHTOOL_MSG_USER_MAX                      = 0x2d
+>>>>>>> v2.1.0
 	ETHTOOL_MSG_KERNEL_NONE                   = 0x0
 	ETHTOOL_MSG_STRSET_GET_REPLY              = 0x1
 	ETHTOOL_MSG_LINKINFO_GET_REPLY            = 0x2
@@ -3854,6 +3858,7 @@ const (
 	ETHTOOL_MSG_MODULE_NTF                    = 0x24
 	ETHTOOL_MSG_PSE_GET_REPLY                 = 0x25
 	ETHTOOL_MSG_RSS_GET_REPLY                 = 0x26
+<<<<<<< HEAD
 	ETHTOOL_MSG_PLCA_GET_CFG_REPLY            = 0x27
 	ETHTOOL_MSG_PLCA_GET_STATUS_REPLY         = 0x28
 	ETHTOOL_MSG_PLCA_NTF                      = 0x29
@@ -3865,6 +3870,9 @@ const (
 	ETHTOOL_MSG_TSCONFIG_GET_REPLY            = 0x2f
 	ETHTOOL_MSG_TSCONFIG_SET_REPLY            = 0x30
 	ETHTOOL_MSG_KERNEL_MAX                    = 0x30
+=======
+	ETHTOOL_MSG_KERNEL_MAX                    = 0x2e
+>>>>>>> v2.1.0
 	ETHTOOL_FLAG_COMPACT_BITSETS              = 0x1
 	ETHTOOL_FLAG_OMIT_REPLY                   = 0x2
 	ETHTOOL_FLAG_STATS                        = 0x4
@@ -4780,7 +4788,11 @@ const (
 	NL80211_ATTR_MAC_HINT                                   = 0xc8
 	NL80211_ATTR_MAC_MASK                                   = 0xd7
 	NL80211_ATTR_MAX_AP_ASSOC_STA                           = 0xca
+<<<<<<< HEAD
 	NL80211_ATTR_MAX                                        = 0x150
+=======
+	NL80211_ATTR_MAX                                        = 0x14d
+>>>>>>> v2.1.0
 	NL80211_ATTR_MAX_CRIT_PROT_DURATION                     = 0xb4
 	NL80211_ATTR_MAX_CSA_COUNTERS                           = 0xce
 	NL80211_ATTR_MAX_HW_TIMESTAMP_PEERS                     = 0x143

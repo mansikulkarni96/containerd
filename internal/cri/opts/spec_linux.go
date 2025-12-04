@@ -31,6 +31,7 @@ import (
 	runtime "k8s.io/cri-api/pkg/apis/runtime/v1"
 	"tags.cncf.io/container-device-interface/pkg/cdi"
 
+<<<<<<< HEAD
 <<<<<<< HEAD:pkg/cri/opts/spec_linux.go
 	"github.com/containerd/containerd/containers"
 	"github.com/containerd/containerd/oci"
@@ -38,11 +39,17 @@ import (
 	"github.com/containerd/log"
 =======
 	"github.com/containerd/log"
+=======
+	"github.com/containerd/log"
+>>>>>>> v2.1.0
 
 	"github.com/containerd/containerd/v2/core/containers"
 	cdispec "github.com/containerd/containerd/v2/pkg/cdi"
 	"github.com/containerd/containerd/v2/pkg/oci"
+<<<<<<< HEAD
 >>>>>>> v2.0.7:internal/cri/opts/spec_linux.go
+=======
+>>>>>>> v2.1.0
 )
 
 // Linux dependent OCI spec opts.
@@ -224,6 +231,9 @@ func WithCDI(annotations map[string]string, CDIDevices []*runtime.CDIDevice) oci
 		}
 
 		return cdispec.WithCDIDevices(devices...)(ctx, client, c, s)
+<<<<<<< HEAD
 >>>>>>> v2.0.7:internal/cri/opts/spec_linux.go
+=======
+>>>>>>> v2.1.0
 	}
 }

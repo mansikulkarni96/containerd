@@ -28,6 +28,7 @@ import (
 	"sync"
 	"time"
 
+<<<<<<< HEAD
 <<<<<<< HEAD:remotes/docker/pusher.go
 	"github.com/containerd/log"
 	digest "github.com/opencontainers/go-digest"
@@ -43,11 +44,21 @@ import (
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/containerd/v2/core/remotes"
 	remoteserrors "github.com/containerd/containerd/v2/core/remotes/errors"
+=======
+>>>>>>> v2.1.0
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
 	digest "github.com/opencontainers/go-digest"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+<<<<<<< HEAD
 >>>>>>> v2.0.7:core/remotes/docker/pusher.go
+=======
+
+	"github.com/containerd/containerd/v2/core/content"
+	"github.com/containerd/containerd/v2/core/images"
+	"github.com/containerd/containerd/v2/core/remotes"
+	remoteserrors "github.com/containerd/containerd/v2/core/remotes/errors"
+>>>>>>> v2.1.0
 )
 
 type dockerPusher struct {
@@ -127,7 +138,7 @@ func (p dockerPusher) push(ctx context.Context, desc ocispec.Descriptor, ref str
 
 	log.G(ctx).WithField("url", req.String()).Debugf("checking and pushing to")
 
-	resp, err := req.doWithRetries(ctx, nil)
+	resp, err := req.doWithRetries(ctx, true)
 	if err != nil {
 		if !errors.Is(err, ErrInvalidAuthorization) {
 			return nil, err
@@ -188,7 +199,7 @@ func (p dockerPusher) push(ctx context.Context, desc ocispec.Descriptor, ref str
 			//
 			// for the private repo, we should remove mount-from
 			// query and send the request again.
-			resp, err = preq.doWithRetries(pctx, nil)
+			resp, err = preq.doWithRetries(pctx, true)
 			if err != nil {
 				if !errors.Is(err, ErrInvalidAuthorization) {
 					return nil, fmt.Errorf("pushing with mount from %s: %w", fromRepo, err)
@@ -200,6 +211,7 @@ func (p dockerPusher) push(ctx context.Context, desc ocispec.Descriptor, ref str
 				case http.StatusUnauthorized:
 					log.G(ctx).Debugf("failed to mount from repository %s, not authorized", fromRepo)
 
+<<<<<<< HEAD
 <<<<<<< HEAD:remotes/docker/pusher.go
 			switch resp.StatusCode {
 			case http.StatusUnauthorized:
@@ -210,17 +222,22 @@ func (p dockerPusher) push(ctx context.Context, desc ocispec.Descriptor, ref str
 			case http.StatusCreated:
 				mountedFrom = path.Join(p.refspec.Hostname(), fromRepo)
 =======
+=======
+>>>>>>> v2.1.0
 					resp.Body.Close()
 					resp = nil
 				case http.StatusCreated:
 					mountedFrom = path.Join(p.refspec.Hostname(), fromRepo)
 				}
+<<<<<<< HEAD
 >>>>>>> v2.0.7:core/remotes/docker/pusher.go
+=======
+>>>>>>> v2.1.0
 			}
 		}
 
 		if resp == nil {
-			resp, err = req.doWithRetries(ctx, nil)
+			resp, err = req.doWithRetries(ctx, true)
 			if err != nil {
 				if errors.Is(err, ErrInvalidAuthorization) {
 					return nil, fmt.Errorf("push access denied, repository does not exist or may require authorization: %w", err)
@@ -312,7 +329,7 @@ func (p dockerPusher) push(ctx context.Context, desc ocispec.Descriptor, ref str
 	req.size = desc.Size
 
 	go func() {
-		resp, err := req.doWithRetries(ctx, nil)
+		resp, err := req.doWithRetries(ctx, true)
 		if err != nil {
 			pushw.setError(err)
 			return

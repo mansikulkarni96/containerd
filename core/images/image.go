@@ -385,7 +385,10 @@ func Children(ctx context.Context, provider content.Provider, desc ocispec.Descr
 		return append([]ocispec.Descriptor{}, index.Manifests...), nil
 	} else if !IsLayerType(desc.MediaType) && !IsKnownConfig(desc.MediaType) && !IsAttestationType(desc.MediaType) {
 		// Layers, configs, and attestations are childless data types and should not be logged.
+<<<<<<< HEAD
 >>>>>>> v2.0.7:core/images/image.go
+=======
+>>>>>>> v2.1.0
 		log.G(ctx).Debugf("encountered unknown type %v; children may not be fetched", desc.MediaType)
 	}
 	return nil, nil

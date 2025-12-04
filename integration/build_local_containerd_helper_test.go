@@ -86,7 +86,11 @@ import (
 	_ "github.com/containerd/containerd/v2/plugins/services/snapshots"
 	_ "github.com/containerd/containerd/v2/plugins/services/tasks"
 	_ "github.com/containerd/containerd/v2/plugins/services/version"
+<<<<<<< HEAD
 >>>>>>> v2.0.7
+=======
+	_ "github.com/containerd/containerd/v2/plugins/transfer"
+>>>>>>> v2.1.0
 
 	"github.com/stretchr/testify/require"
 )

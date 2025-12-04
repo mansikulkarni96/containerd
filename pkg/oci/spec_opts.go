@@ -29,6 +29,7 @@ import (
 	"strconv"
 	"strings"
 
+<<<<<<< HEAD
 <<<<<<< HEAD:oci/spec_opts.go
 	"github.com/containerd/containerd/containers"
 	"github.com/containerd/containerd/content"
@@ -37,6 +38,8 @@ import (
 	"github.com/containerd/containerd/namespaces"
 =======
 >>>>>>> v2.0.7:pkg/oci/spec_opts.go
+=======
+>>>>>>> v2.1.0
 	"github.com/containerd/continuity/fs"
 	"github.com/containerd/platforms"
 	"github.com/moby/sys/user"
@@ -603,6 +606,7 @@ func WithUser(userstr string) SpecOpts {
 		setProcess(s)
 		s.Process.User.AdditionalGids = nil
 		// While the Linux kernel allows the max UID to be MaxUint32 - 2,
+<<<<<<< HEAD
 <<<<<<< HEAD:oci/spec_opts.go
                 // and the OCI Runtime Spec has no definition about the max UID,
                 // the runc implementation is known to require the UID to be <= MaxInt32.
@@ -612,6 +616,8 @@ func WithUser(userstr string) SpecOpts {
                 // In future we may relax this limitation to allow MaxUint32 - 2,
                 // or, amend the OCI Runtime Spec to codify the implementation limitation.
 =======
+=======
+>>>>>>> v2.1.0
 		// and the OCI Runtime Spec has no definition about the max UID,
 		// the runc implementation is known to require the UID to be <= MaxInt32.
 		//
@@ -619,7 +625,10 @@ func WithUser(userstr string) SpecOpts {
 		//
 		// In future we may relax this limitation to allow MaxUint32 - 2,
 		// or, amend the OCI Runtime Spec to codify the implementation limitation.
+<<<<<<< HEAD
 >>>>>>> v2.0.7:pkg/oci/spec_opts.go
+=======
+>>>>>>> v2.1.0
 		const (
 			minUserID  = 0
 			maxUserID  = math.MaxInt32

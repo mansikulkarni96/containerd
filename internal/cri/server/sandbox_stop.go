@@ -57,8 +57,11 @@ func (c *criService) StopPodSandbox(ctx context.Context, r *runtime.StopPodSandb
 
 	defer c.nri.BlockPluginSync().Unblock()
 
+<<<<<<< HEAD
 <<<<<<< HEAD:pkg/cri/sbserver/sandbox_stop.go
 =======
+=======
+>>>>>>> v2.1.0
 	span.SetAttributes(tracing.Attribute("sandbox.id", sandbox.ID))
 >>>>>>> v2.0.7:internal/cri/server/sandbox_stop.go
 	if err := c.stopPodSandbox(ctx, sandbox); err != nil {
@@ -141,6 +144,11 @@ func (c *criService) stopPodSandbox(ctx context.Context, sandbox sandboxstore.Sa
 	}
 
 	log.G(ctx).Infof("TearDown network for sandbox %q successfully", id)
+
+	err = c.cleanupImageMounts(ctx, id)
+	if err != nil {
+		return fmt.Errorf("failed to cleanup image mounts for sandbox %q: %w", id, err)
+	}
 	return nil
 }
 

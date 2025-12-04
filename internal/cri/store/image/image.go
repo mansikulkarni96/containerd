@@ -29,11 +29,11 @@ import (
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/containerd/v2/core/images/usage"
 	"github.com/containerd/containerd/v2/internal/cri/labels"
+	"github.com/containerd/containerd/v2/internal/cri/setutils"
 	"github.com/containerd/containerd/v2/internal/cri/util"
 	"github.com/containerd/errdefs"
 	"github.com/containerd/platforms"
 	docker "github.com/distribution/reference"
-	"k8s.io/apimachinery/pkg/util/sets"
 
 >>>>>>> v2.0.7:internal/cri/store/image/image.go
 	imagedigest "github.com/opencontainers/go-digest"
@@ -103,7 +103,7 @@ func NewStore(img Getter, provider content.InfoReaderProvider, platform platform
 		store: &store{
 			images:     make(map[string]Image),
 			digestSet:  digestset.NewSet(),
-			pinnedRefs: make(map[string]sets.Set[string]),
+			pinnedRefs: make(map[string]setutils.Set[string]),
 		},
 	}
 }
@@ -232,7 +232,7 @@ type store struct {
 	lock       sync.RWMutex
 	images     map[string]Image
 	digestSet  *digestset.Set
-	pinnedRefs map[string]sets.Set[string]
+	pinnedRefs map[string]setutils.Set[string]
 }
 
 func (s *store) list() []Image {
@@ -259,7 +259,7 @@ func (s *store) add(img Image) error {
 
 	if img.Pinned {
 		if refs := s.pinnedRefs[img.ID]; refs == nil {
-			s.pinnedRefs[img.ID] = sets.New(img.References...)
+			s.pinnedRefs[img.ID] = setutils.New(img.References...)
 		} else {
 			refs.Insert(img.References...)
 		}
@@ -305,7 +305,7 @@ func (s *store) pin(id, ref string) error {
 	}
 
 	if refs := s.pinnedRefs[digest.String()]; refs == nil {
-		s.pinnedRefs[digest.String()] = sets.New(ref)
+		s.pinnedRefs[digest.String()] = setutils.New(ref)
 	} else {
 		refs.Insert(ref)
 	}

@@ -29,6 +29,10 @@ import (
 >>>>>>> v2.0.7:internal/cri/config/config_unix.go
 )
 
+func defaultNetworkPluginBinDirs() []string {
+	return []string{"/opt/cni/bin"}
+}
+
 func DefaultImageConfig() ImageConfig {
 	return ImageConfig{
 		Snapshotter:                defaults.DefaultSnapshotter,
@@ -81,7 +85,7 @@ func DefaultRuntimeConfig() RuntimeConfig {
 
 	return RuntimeConfig{
 		CniConfig: CniConfig{
-			NetworkPluginBinDir:        "/opt/cni/bin",
+			NetworkPluginBinDirs:       defaultNetworkPluginBinDirs(),
 			NetworkPluginConfDir:       "/etc/cni/net.d",
 			NetworkPluginMaxConfNum:    1, // only one CNI plugin config file will be loaded
 			NetworkPluginSetupSerially: false,

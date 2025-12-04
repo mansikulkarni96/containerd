@@ -18,11 +18,15 @@ package mount
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"reflect"
+<<<<<<< HEAD
 	"strings"
+=======
+>>>>>>> v2.1.0
 	"syscall"
 	"testing"
 
@@ -204,6 +208,7 @@ func TestUnmountRecursive(t *testing.T) {
 	}
 }
 
+<<<<<<< HEAD
 func TestDoPrepareIDMappedOverlayCleanups(t *testing.T) {
 	testutil.RequiresRoot(t)
 	if !supportsIDMap(t.TempDir()) {
@@ -303,6 +308,8 @@ func TestDoPrepareIDMappedOverlayCleanups(t *testing.T) {
 	}
 }
 
+=======
+>>>>>>> v2.1.0
 func TestDoPrepareIDMappedOverlay(t *testing.T) {
 	testutil.RequiresRoot(t)
 
@@ -377,6 +384,7 @@ func TestDoPrepareIDMappedOverlay(t *testing.T) {
 
 			cleanup()
 
+<<<<<<< HEAD
 			err = os.Remove(remountsLocation)
 
 			if tc.injectUmountFault {
@@ -384,6 +392,17 @@ func TestDoPrepareIDMappedOverlay(t *testing.T) {
 				assert.Error(t, err, "expected remove to fail (dir not empty), expected remount child locations to still exist after unmount failure")
 			} else {
 				assert.NoError(t, err, "expected remove to work (dir empty), the child directory should be unmounted and removed")
+=======
+			_, err = os.Stat(remountsLocation)
+
+			if tc.injectUmountFault {
+				// We should have failed to remove the remounts location if the unmount failed.
+				assert.NoError(t, err, "expected remounts location to still exist after unmount failure")
+			} else {
+				pathErr, isPathErr := err.(*fs.PathError)
+				require.True(t, isPathErr, "expected a PathError")
+				assert.Equal(t, unix.ENOENT, pathErr.Err, "temporary remounts should be cleaned up")
+>>>>>>> v2.1.0
 			}
 
 			// Original lowerdirs should be unaffected.
@@ -492,6 +511,7 @@ func supportsIDMap(path string) bool {
 
 	return true
 }
+<<<<<<< HEAD
 
 func TestBuildIDMappedPaths(t *testing.T) {
 	testCases := []struct {
@@ -653,3 +673,5 @@ func TestGetCommonDirectory(t *testing.T) {
 		})
 	}
 }
+=======
+>>>>>>> v2.1.0

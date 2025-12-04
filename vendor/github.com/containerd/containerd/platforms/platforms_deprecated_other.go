@@ -1,7 +1,8 @@
-//go:build !windows
+//go:build darwin
+// +build darwin
 
 /*
-   Copyright The containerd Authors.
+   Copyright © 2021 The CDI Authors
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -16,8 +17,15 @@
    limitations under the License.
 */
 
-package platforms
+package cdi
 
+<<<<<<<< HEAD:vendor/github.com/containerd/containerd/platforms/platforms_deprecated_other.go
 func getWindowsOsVersion() string {
 	return ""
+========
+import "syscall"
+
+func osSync() {
+	_ = syscall.Sync()
+>>>>>>>> v2.1.0:vendor/tags.cncf.io/container-device-interface/pkg/cdi/cache_test_darwin.go
 }

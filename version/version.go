@@ -25,10 +25,14 @@ var (
 
 	// Version holds the complete version number. Filled in at linking time.
 <<<<<<< HEAD
+<<<<<<< HEAD
 	Version = "1.7.29+unknown"
 =======
 	Version = "2.0.7+unknown"
 >>>>>>> v2.0.7
+=======
+	Version = "2.1.0+unknown"
+>>>>>>> v2.1.0
 
 	// Revision is filled with the VCS (e.g. git) revision being used to build
 	// the program at linking time.

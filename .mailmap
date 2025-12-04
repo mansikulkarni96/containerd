@@ -19,7 +19,10 @@ Andrey Kolomentsev <andrey.kolomentsev@gmail.com>
 Arnaud Porterie <icecrime@gmail.com>
 Arnaud Porterie <icecrime@gmail.com> <arnaud.porterie@docker.com>
 Austin Vazquez <austin.vazquez.dev@gmail.com> <macedonv@amazon.com>
+<<<<<<< HEAD
 Austin Vazquez <austin.vazquez.dev@gmail.com> <austin.vazquez@docker.com>
+=======
+>>>>>>> v2.1.0
 Bob Mader <swapdisk@users.noreply.github.com>
 Boris Popovschi <zyqsempai@mail.ru>
 Bowen Yan <loneybw@gmail.com>
@@ -50,6 +53,8 @@ Fupan Li <lifupan@gmail.com>
 Fupan Li <lifupan@gmail.com> <fupan.lfp@antfin.com>
 Fupan Li <lifupan@gmail.com> <fupan.lfp@antgroup.com>
 Furkan Türkal <furkan.turkal@trendyol.com>
+Gao Xiang <xiang@kernel.org>
+Gao Xiang <xiang@kernel.org> <hsiangkao@linux.alibaba.com>
 Georgia Panoutsakopoulou <gpanoutsak@gmail.com>
 guodong <guodong9211@gmail.com>
 Guangming Wang <guangming.wang@daocloud.io>
@@ -88,6 +93,7 @@ Jun Lin Chen <webmaster@mc256.com> <1913688+mc256@users.noreply.github.com>
 Justin Cormack <justin.cormack@docker.com> <justin@specialbusservice.com>
 Justin Terry <juterry@microsoft.com>
 Justin Terry <juterry@microsoft.com> <jterry75@users.noreply.github.com>
+Kaita Nakamura <kaita.nakamura0830@gmail.com>
 Kante <kerthcet@gmail.com>
 Kazuyoshi Kato <kato.kazuyoshi@gmail.com>
 Kazuyoshi Kato <kato.kazuyoshi@gmail.com> <kaz@fly.io>
@@ -102,7 +108,11 @@ Kirtana Ashok <Kirtana.Ashok@microsoft.com> <kiashok@microsoft.com>
 =======
 Kirtana Ashok <kiashok@microsoft.com>
 Kirtana Ashok <kiashok@microsoft.com> <Kirtana.Ashok@microsoft.com>
+<<<<<<< HEAD
 >>>>>>> v2.0.7
+=======
+Kirtana Ashok <kiashok@microsoft.com> <99994218+kiashok@users.noreply.github.com>
+>>>>>>> v2.1.0
 Kitt Hsu <kitt.hsu@gmail.com>
 Kohei Tokunaga <ktokunaga.mail@gmail.com>
 Krasi Georgiev <krasi.root@gmail.com> <krasi@vip-consult.solutions>
@@ -141,6 +151,7 @@ Pan Yibo <mstmdev@gmail.com>
 Phil Estes <estesp@gmail.com> <estesp@linux.vnet.ibm.com>
 Phil Estes <estesp@gmail.com> <estesp@amazon.com>
 Qian Zhang <cosmoer@qq.com>
+QiPing Wan <alingse@foxmail.com>
 Reid Li <reid.li@utexas.edu>
 Robin Winkelewski <w9ncontact@gmail.com>
 roman-kiselenko <roman.kiselenko.dev@gmail.com> <shindu666@gmail.com>

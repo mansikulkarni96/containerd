@@ -1,7 +1,11 @@
 linters:
   enable:
     - depguard # Checks for dependencies that should not be (re)introduced. See "linter-settings" for further details.
+<<<<<<< HEAD
     # - copyloopvar # Checks for loop variable copies in Go 1.22+
+=======
+    - copyloopvar # Checks for loop variable copies in Go 1.22+
+>>>>>>> v2.1.0
     - gofmt
     - goimports
     - gosec
@@ -28,6 +32,7 @@ issues:
     - api
     - cluster
 <<<<<<< HEAD
+<<<<<<< HEAD
     - design
     - docs
     - docs/man
@@ -38,6 +43,11 @@ issues:
     - docs/man
     - releases
 >>>>>>> v2.0.7
+=======
+    - docs
+    - docs/man
+    - releases
+>>>>>>> v2.1.0
     - test # e2e scripts
 
   # Only using / doesn't work due to https://github.com/golangci/golangci-lint/issues/1398.
@@ -73,6 +83,7 @@ issues:
         - revive
       text: "redefines-builtin-id"
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     # FIXME temporarily suppress deprecation warnings for the logs package. See https://github.com/containerd/containerd/pull/9086
     - text: "SA1019: log\\.(G|L|Fields|Entry|RFC3339NanoFixed|Level|TraceLevel|DebugLevel|InfoLevel|WarnLevel|ErrorLevel|FatalLevel|PanicLevel|SetLevel|GetLevel|OutputFormat|TextFormat|JSONFormat|SetFormat|WithLogger|GetLogger)"
@@ -84,6 +95,12 @@ issues:
 
 =======
 >>>>>>> v2.0.7
+=======
+    - linters:
+        - forbidigo
+      text: 'use of `regexp.MustCompile` forbidden'
+      path: _test\.go
+>>>>>>> v2.1.0
 
 linters-settings:
   depguard:
@@ -98,6 +115,11 @@ linters-settings:
 =======
           - pkg: github.com/opencontainers/runc
             desc: We don't want to depend on runc (libcontainer), unless there is no other option; see https://github.com/opencontainers/runc/issues/3028.
+  forbidigo:
+    forbid:
+      - pkg: ^regexp$
+        p: ^regexp\.MustCompile
+        msg: Use internal/lazyregexp.New instead.
 
 >>>>>>> v2.0.7
   gosec:
@@ -113,10 +135,15 @@ linters-settings:
       - G404
       - G115
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   nolintlint:
     allow-unused: true
 >>>>>>> v2.0.7
+=======
+  nolintlint:
+    allow-unused: true
+>>>>>>> v2.1.0
 
 run:
   timeout: 8m

@@ -139,7 +139,6 @@ func TestPodAnnotationPassthroughContainerSpec(t *testing.T) {
 			},
 		},
 	} {
-		test := test
 		t.Run(test.desc, func(t *testing.T) {
 			c := newTestCRIService()
 			containerConfig, sandboxConfig, imageConfig, specCheck := getCreateContainerTestData()
@@ -213,7 +212,6 @@ func TestContainerSpecCommand(t *testing.T) {
 			expectErr: true,
 		},
 	} {
-		test := test
 		t.Run(test.desc, func(t *testing.T) {
 			config, _, imageConfig, _ := getCreateContainerTestData()
 			config.Command = test.criEntrypoint
@@ -366,7 +364,6 @@ func TestVolumeMounts(t *testing.T) {
 		},
 >>>>>>> v2.0.7:internal/cri/server/container_create_test.go
 	} {
-		test := test
 		t.Run(test.desc, func(t *testing.T) {
 			config := &imagespec.ImageConfig{
 				Volumes: test.imageVolumes,
@@ -516,7 +513,6 @@ func TestContainerAnnotationPassthroughContainerSpec(t *testing.T) {
 			},
 		},
 	} {
-		test := test
 		t.Run(test.desc, func(t *testing.T) {
 			c := newTestCRIService()
 			containerConfig, sandboxConfig, imageConfig, specCheck := getCreateContainerTestData()
@@ -769,7 +765,6 @@ func TestLinuxContainerMounts(t *testing.T) {
 			expectedMounts:  nil,
 		},
 	} {
-		test := test
 		t.Run(test.desc, func(t *testing.T) {
 			config := &runtime.ContainerConfig{
 				Metadata: &runtime.ContainerMetadata{

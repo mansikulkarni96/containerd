@@ -509,7 +509,11 @@ func (fr *Framer) ReadFrame() (Frame, error) {
 	}
 	if fh.Length > fr.maxReadSize {
 		if fh == invalidHTTP1LookingFrameHeader() {
+<<<<<<< HEAD
 			return nil, fmt.Errorf("http2: failed reading the frame payload: %w, note that the frame header looked like an HTTP/1.1 header", ErrFrameTooLarge)
+=======
+			return nil, fmt.Errorf("http2: failed reading the frame payload: %w, note that the frame header looked like an HTTP/1.1 header", err)
+>>>>>>> v2.1.0
 		}
 		return nil, ErrFrameTooLarge
 	}

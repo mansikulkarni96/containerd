@@ -31,7 +31,10 @@ import (
 	"github.com/containerd/containerd/v2/core/remotes"
 	"github.com/containerd/containerd/v2/core/transfer"
 	"github.com/containerd/errdefs"
+<<<<<<< HEAD
 >>>>>>> v2.0.7:core/transfer/local/progress.go
+=======
+>>>>>>> v2.1.0
 	"github.com/containerd/log"
 	"github.com/opencontainers/go-digest"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"

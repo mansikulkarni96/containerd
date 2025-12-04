@@ -21,12 +21,17 @@ import (
 	"strings"
 	"testing"
 
+<<<<<<< HEAD
 <<<<<<< HEAD:pkg/cri/store/image/image_test.go
 	"github.com/containerd/containerd/errdefs"
 =======
 	"github.com/containerd/errdefs"
 >>>>>>> v2.0.7:internal/cri/store/image/image_test.go
 	"k8s.io/apimachinery/pkg/util/sets"
+=======
+	"github.com/containerd/containerd/v2/internal/cri/setutils"
+	"github.com/containerd/errdefs"
+>>>>>>> v2.1.0
 
 	"github.com/opencontainers/go-digest/digestset"
 	assertlib "github.com/stretchr/testify/assert"
@@ -65,7 +70,7 @@ func TestInternalStore(t *testing.T) {
 	s := &store{
 		images:     make(map[string]Image),
 		digestSet:  digestset.NewSet(),
-		pinnedRefs: make(map[string]sets.Set[string]),
+		pinnedRefs: make(map[string]setutils.Set[string]),
 	}
 
 	t.Logf("should be able to add image")
@@ -148,7 +153,7 @@ func TestInternalStorePinnedImage(t *testing.T) {
 	s := &store{
 		images:     make(map[string]Image),
 		digestSet:  digestset.NewSet(),
-		pinnedRefs: make(map[string]sets.Set[string]),
+		pinnedRefs: make(map[string]setutils.Set[string]),
 	}
 
 	ref1 := "containerd.io/ref-1"

@@ -72,7 +72,10 @@ if [ ! -z "$CGROUP_DRIVER" ] && [ "$CGROUP_DRIVER" = "systemd" ];then
 EOF
 fi
 
+<<<<<<< HEAD
 >>>>>>> v2.0.7
+=======
+>>>>>>> v2.1.0
 GINKGO_SKIP_TEST=()
 if [ -n "${SKIP_TEST:-}" ]; then
   GINKGO_SKIP_TEST+=("--ginkgo.skip" "$SKIP_TEST")

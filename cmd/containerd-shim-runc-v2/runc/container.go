@@ -494,6 +494,7 @@ func (c *Container) HasPid(pid int) bool {
 	return false
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD:runtime/v2/runc/container.go
 func loadProcessCgroup(_ context.Context, pid int) (cg interface{}, err error) {
 	if cgroups.Mode() == cgroups.Unified {
@@ -501,31 +502,44 @@ func loadProcessCgroup(_ context.Context, pid int) (cg interface{}, err error) {
 		if err != nil {
 			logrus.WithError(err).Errorf("loading cgroup2 for %d", pid)
 =======
+=======
+>>>>>>> v2.1.0
 func loadProcessCgroup(ctx context.Context, pid int) (cg interface{}, err error) {
 	if cgroups.Mode() == cgroups.Unified {
 		g, err := cgroupsv2.PidGroupPath(pid)
 		if err != nil {
 			log.G(ctx).WithError(err).Errorf("loading cgroup2 for %d", pid)
+<<<<<<< HEAD
 >>>>>>> v2.0.7:cmd/containerd-shim-runc-v2/runc/container.go
+=======
+>>>>>>> v2.1.0
 			return nil, err
 		}
 		cg, err = cgroupsv2.Load(g)
 		if err != nil {
+<<<<<<< HEAD
 <<<<<<< HEAD:runtime/v2/runc/container.go
 			logrus.WithError(err).Errorf("loading cgroup2 for %d", pid)
 =======
 			log.G(ctx).WithError(err).Errorf("loading cgroup2 for %d", pid)
 >>>>>>> v2.0.7:cmd/containerd-shim-runc-v2/runc/container.go
+=======
+			log.G(ctx).WithError(err).Errorf("loading cgroup2 for %d", pid)
+>>>>>>> v2.1.0
 			return nil, err
 		}
 	} else {
 		cg, err = cgroup1.Load(cgroup1.PidPath(pid))
 		if err != nil {
+<<<<<<< HEAD
 <<<<<<< HEAD:runtime/v2/runc/container.go
 			logrus.WithError(err).Errorf("loading cgroup for %d", pid)
 =======
 			log.G(ctx).WithError(err).Errorf("loading cgroup for %d", pid)
 >>>>>>> v2.0.7:cmd/containerd-shim-runc-v2/runc/container.go
+=======
+			log.G(ctx).WithError(err).Errorf("loading cgroup for %d", pid)
+>>>>>>> v2.1.0
 			return nil, err
 		}
 	}

@@ -29,23 +29,32 @@ jobs:
 
     strategy:
       matrix:
+<<<<<<< HEAD
         os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest]
         exclude:
           - os: ${{ github.event.repository.private && 'ubuntu-24.04-arm' || '' }}
 <<<<<<< HEAD
 =======
+=======
+        os: [ubuntu-24.04, ubuntu-24.04-arm, macos-13, windows-2019]
+>>>>>>> v2.1.0
 
 >>>>>>> v2.0.7
 
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: ./.github/actions/install-go
+<<<<<<< HEAD
       - uses: golangci/golangci-lint-action@2226d7cb06a077cd73e56eedd38eecad18e5d837 # v6.5.0
         with:
 <<<<<<< HEAD
           only-new-issues: true
 =======
 >>>>>>> v2.0.7
+=======
+      - uses: golangci/golangci-lint-action@55c2c1448f86e01eaae002a5a3a9624417608d84 # v6.5.2
+        with:
+>>>>>>> v2.1.0
           version: v1.64.2
           skip-cache: true
           args: --timeout=8m
@@ -66,7 +75,11 @@ jobs:
 
       - uses: ./src/github.com/containerd/containerd/.github/actions/install-go
 
+<<<<<<< HEAD
       - uses: containerd/project-checks@800740a80e93c309f9a40903ce26d749ad0909ec # v1.2.1
+=======
+      - uses: containerd/project-checks@d7751f3c375b8fe4a84c02a068184ee4c1f59bc4 # v1.2.2
+>>>>>>> v2.1.0
         if: github.repository == 'containerd/containerd'
         with:
           working-directory: src/github.com/containerd/containerd
@@ -203,10 +216,15 @@ jobs:
 
     strategy:
       matrix:
+<<<<<<< HEAD
         os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest]
         go-version: ["1.23.12", "1.24.9", "1.25.3"]
         exclude:
           - os: ${{ github.event.repository.private && 'ubuntu-24.04-arm' || '' }}
+=======
+        os: [ubuntu-22.04, ubuntu-24.04, ubuntu-24.04-arm, macos-13, windows-2019, windows-2022]
+        go-version: ["1.23.8", "1.24.2"]
+>>>>>>> v2.1.0
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: ./.github/actions/install-go
@@ -373,7 +391,7 @@ jobs:
           }
           critest.exe --runtime-endpoint=npipe://.//pipe//containerd-containerd --test-images-file='${{env.CRI_TEST_IMAGES}}' --report-dir='${{github.workspace}}/critestreport' $skip
 
-      - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
 <<<<<<< HEAD
@@ -389,7 +407,7 @@ jobs:
   integration-linux:
     name: Linux Integration
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 40
+    timeout-minutes: 60
     needs: [project, linters, protos, man]
 
     strategy:
@@ -428,6 +446,7 @@ jobs:
           script/setup/install-failpoint-binaries
 
 <<<<<<< HEAD
+<<<<<<< HEAD
       - name: Install criu
         if: matrix.os != 'ubuntu-24.04-arm'
 =======
@@ -435,6 +454,11 @@ jobs:
       - if: matrix.os != 'ubuntu-24.04-arm'
         name: Install criu
 >>>>>>> v2.0.7
+=======
+      # Disable criu testing on arm64 until we can solve the consistent failures of restore testing
+      - if: matrix.os != 'ubuntu-24.04-arm'
+        name: Install criu
+>>>>>>> v2.1.0
         run: |
           sudo add-apt-repository -y ppa:criu/ppa
           sudo apt-get update
@@ -518,6 +542,23 @@ jobs:
           env
           sudo -E PATH=$PATH ./script/critest.sh "${{github.workspace}}/report"
 
+      - name: Install tools
+        # The GitHub Actions image already has buildah and podman included. Not the
+        # ubuntu-24.04-arm images. buildah and podman  is needed to convert the
+        # Kubernetes checkpoint archive to an OCI image.
+        # See contrib/checkpoint/checkpoint-restore-cri-test.sh
+        if: matrix.os == 'ubuntu-24.04-arm'
+        run: sudo apt-get install -y buildah podman
+
+      - if: matrix.os != 'ubuntu-24.04-arm'
+        name: Checkpoint/Restore via CRI
+        env:
+          TEST_RUNTIME: ${{ matrix.runtime }}
+          CGROUP_DRIVER: ${{ matrix.cgroup_driver }}
+        run: |
+          env
+          sudo -E PATH=$PATH ./contrib/checkpoint/checkpoint-restore-cri-test.sh
+
       # Log the status of this VM to investigate issues like
       # https://github.com/containerd/containerd/issues/4969
       - name: Host Status
@@ -537,7 +578,7 @@ jobs:
           sudo lsmod
           sudo dmesg -T -f kern
 
-      - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
 <<<<<<< HEAD
@@ -589,6 +630,7 @@ jobs:
 
 =======
         include:
+<<<<<<< HEAD
           - box: fedora/43-cloud-base
             cgroup_driver: cgroupfs
             runc: runc
@@ -599,6 +641,18 @@ jobs:
             cgroup_driver: cgroupfs
             runc: crun
           - box: fedora/43-cloud-base
+=======
+          - box: fedora/41-cloud-base
+            cgroup_driver: cgroupfs
+            runc: runc
+          - box: fedora/41-cloud-base
+            cgroup_driver: systemd
+            runc: runc
+          - box: fedora/41-cloud-base
+            cgroup_driver: cgroupfs
+            runc: crun
+          - box: fedora/41-cloud-base
+>>>>>>> v2.1.0
             cgroup_driver: systemd
             runc: crun
             # We have to keep EL8 to test old glibc, cgroup, kernel, etc.
@@ -631,7 +685,11 @@ jobs:
           cat /proc/cpuinfo
           free -mt
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+<<<<<<< HEAD
       - uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+=======
+      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+>>>>>>> v2.1.0
         with:
           path: /root/.vagrant.d
           key: vagrant-${{ matrix.box }}
@@ -652,6 +710,7 @@ jobs:
           sudo env VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 vagrant plugin install vagrant-libvirt
       - name: Boot VM
         run: |
+<<<<<<< HEAD
           if  [ "$BOX" = "fedora/43-cloud-base" ]; then
             # fedora/41-cloud-base seems the last version available in https://portal.cloud.hashicorp.com/vagrant/discover/fedora
             sudo vagrant box add fedora/43-cloud-base https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Vagrant-libvirt-43-1.6.x86_64.vagrant.libvirt.box
@@ -666,6 +725,16 @@ jobs:
         run: sudo RUNC_RUNTIME=$RUNTIME BOX=$BOX vagrant up --provision-with=selinux,install-runc,install-gotestsum,test-cri
 =======
           sudo BOX=$BOX RUNC_FLAVOR=$RUNC_FLAVOR vagrant up --no-tty
+=======
+          sudo BOX=$BOX RUNC_FLAVOR=$RUNC_FLAVOR vagrant up --no-tty
+          if  [ "$BOX" = "fedora/41-cloud-base" ]; then
+            # Install the kernel update for Fedora 41 to fix an error "Extension MARK revision 0 not supported, missing kernel module"
+            # https://bugzilla.redhat.com/show_bug.cgi?id=2321325
+            sudo BOX=$BOX RUNC_FLAVOR=$RUNC_FLAVOR vagrant up --provision-with=upgrade-packages
+            sudo BOX=$BOX RUNC_FLAVOR=$RUNC_FLAVOR vagrant halt
+            sudo BOX=$BOX RUNC_FLAVOR=$RUNC_FLAVOR vagrant up
+          fi
+>>>>>>> v2.1.0
       - name: test-integration
         run: sudo BOX=$BOX RUNC_FLAVOR=$RUNC_FLAVOR vagrant up --provision-with=selinux,install-runc,install-gotestsum,test-integration
       - name: test-cri-integration
@@ -760,7 +829,7 @@ jobs:
         if: always()
       - run: script/test/test2annotation.sh *-gotest.json
         if: always()
-      - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
           name: TestResults MacOS

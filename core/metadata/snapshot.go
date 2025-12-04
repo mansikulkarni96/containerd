@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"strings"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/containerd/log"
@@ -46,7 +45,11 @@ import (
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
 	bolt "go.etcd.io/bbolt"
+<<<<<<< HEAD
 >>>>>>> v2.0.7:core/metadata/snapshot.go
+=======
+	errbolt "go.etcd.io/bbolt/errors"
+>>>>>>> v2.1.0
 )
 
 const (
@@ -469,7 +472,7 @@ func (s *snapshotter) createSnapshot(ctx context.Context, key, parent string, re
 
 		bbkt, err := bkt.CreateBucket([]byte(key))
 		if err != nil {
-			if err != bolt.ErrBucketExists {
+			if err != errbolt.ErrBucketExists {
 				return err
 			}
 			if rerr == nil {
@@ -568,7 +571,7 @@ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snap
 		}
 		bbkt, err := bkt.CreateBucket([]byte(name))
 		if err != nil {
-			if err == bolt.ErrBucketExists {
+			if err == errbolt.ErrBucketExists {
 				rerr = fmt.Errorf("snapshot %q: %w", name, errdefs.ErrAlreadyExists)
 				return nil
 			}
@@ -737,7 +740,7 @@ func (s *snapshotter) Remove(ctx context.Context, key string) error {
 		}
 
 		// Mark snapshotter as dirty for triggering garbage collection
-		atomic.AddUint32(&s.db.dirty, 1)
+		s.db.dirty.Add(1)
 		s.db.dirtySS[s.name] = struct{}{}
 
 		return nil

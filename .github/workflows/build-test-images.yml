@@ -73,10 +73,14 @@ jobs:
 
       - name: Azure Login
 <<<<<<< HEAD
+<<<<<<< HEAD
         uses: azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d # v1.6.1
 =======
         uses: azure/login@a65d910e8af852a8061c627c456678983e180302 # v2.2.0
 >>>>>>> v2.0.7
+=======
+        uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2.3.0
+>>>>>>> v2.1.0
         with:
           creds: ${{ secrets.AZURE_CREDS }}
 
@@ -163,10 +167,14 @@ jobs:
 
       - name: Login to GitHub Container Registry
 <<<<<<< HEAD
+<<<<<<< HEAD
         uses: docker/login-action@dd4fa0671be5250ee6f50aedf4cb05514abda2c7 # v1.14.1
 =======
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
 >>>>>>> v2.0.7
+=======
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+>>>>>>> v2.1.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}

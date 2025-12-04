@@ -65,8 +65,11 @@ func (c *criService) StopContainer(ctx context.Context, r *runtime.StopContainer
 
 	defer c.nri.BlockPluginSync().Unblock()
 
+<<<<<<< HEAD
 <<<<<<< HEAD:pkg/cri/sbserver/container_stop.go
 =======
+=======
+>>>>>>> v2.1.0
 	span.SetAttributes(tracing.Attribute("container.id", container.ID))
 >>>>>>> v2.0.7:internal/cri/server/container_stop.go
 	if err := c.stopContainer(ctx, container, time.Duration(r.GetTimeout())*time.Second); err != nil {

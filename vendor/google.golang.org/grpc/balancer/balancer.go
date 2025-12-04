@@ -73,17 +73,6 @@ func unregisterForTesting(name string) {
 	delete(m, name)
 }
 
-// connectedAddress returns the connected address for a SubConnState. The
-// address is only valid if the state is READY.
-func connectedAddress(scs SubConnState) resolver.Address {
-	return scs.connectedAddress
-}
-
-// setConnectedAddress sets the connected address for a SubConnState.
-func setConnectedAddress(scs *SubConnState, addr resolver.Address) {
-	scs.connectedAddress = addr
-}
-
 func init() {
 	internal.BalancerUnregister = unregisterForTesting
 	internal.ConnectedAddress = connectedAddress
@@ -106,6 +95,7 @@ func Get(name string) Builder {
 	return nil
 }
 
+<<<<<<< HEAD
 // A SubConn represents a single connection to a gRPC backend service.
 //
 // Each SubConn contains a list of addresses.
@@ -157,6 +147,8 @@ type SubConn interface {
 	Shutdown()
 }
 
+=======
+>>>>>>> v2.1.0
 // NewSubConnOptions contains options to create new SubConn.
 type NewSubConnOptions struct {
 	// CredsBundle is the credentials bundle that will be used in the created
@@ -191,6 +183,13 @@ type State struct {
 // brand new implementation of this interface. For the situations like
 // testing, the new implementation should embed this interface. This allows
 // gRPC to add new methods to this interface.
+//
+// NOTICE: This interface is intended to be implemented by gRPC, or intercepted
+// by custom load balancing polices.  Users should not need their own complete
+// implementation of this interface -- they should always delegate to a
+// ClientConn passed to Builder.Build() by embedding it in their
+// implementations. An embedded ClientConn must never be nil, or runtime panics
+// will occur.
 type ClientConn interface {
 	// NewSubConn is called by balancer to create a new SubConn.
 	// It doesn't block and wait for the connections to be established.
@@ -229,6 +228,17 @@ type ClientConn interface {
 	//
 	// Deprecated: Use the Target field in the BuildOptions instead.
 	Target() string
+
+	// MetricsRecorder provides the metrics recorder that balancers can use to
+	// record metrics. Balancer implementations which do not register metrics on
+	// metrics registry and record on them can ignore this method. The returned
+	// MetricsRecorder is guaranteed to never be nil.
+	MetricsRecorder() estats.MetricsRecorder
+
+	// EnforceClientConnEmbedding is included to force implementers to embed
+	// another implementation of this interface, allowing gRPC to add methods
+	// without breaking users.
+	internal.EnforceClientConnEmbedding
 }
 
 // BuildOptions contains additional information for Build.
@@ -260,10 +270,6 @@ type BuildOptions struct {
 	// same resolver.Target as passed to the resolver. See the documentation for
 	// the resolver.Target type for details about what it contains.
 	Target resolver.Target
-	// MetricsRecorder is the metrics recorder that balancers can use to record
-	// metrics. Balancer implementations which do not register metrics on
-	// metrics registry and record on them can ignore this field.
-	MetricsRecorder estats.MetricsRecorder
 }
 
 // Builder creates a balancer.
@@ -424,18 +430,6 @@ type ExitIdler interface {
 	ExitIdle()
 }
 
-// SubConnState describes the state of a SubConn.
-type SubConnState struct {
-	// ConnectivityState is the connectivity state of the SubConn.
-	ConnectivityState connectivity.State
-	// ConnectionError is set if the ConnectivityState is TransientFailure,
-	// describing the reason the SubConn failed.  Otherwise, it is nil.
-	ConnectionError error
-	// connectedAddr contains the connected address when ConnectivityState is
-	// Ready. Otherwise, it is indeterminate.
-	connectedAddress resolver.Address
-}
-
 // ClientConnState describes the state of a ClientConn relevant to the
 // balancer.
 type ClientConnState struct {
@@ -448,6 +442,7 @@ type ClientConnState struct {
 // ErrBadResolverState may be returned by UpdateClientConnState to indicate a
 // problem with the provided name resolver data.
 var ErrBadResolverState = errors.New("bad resolver state")
+<<<<<<< HEAD
 
 // A ProducerBuilder is a simple constructor for a Producer.  It is used by the
 // SubConn to create producers when needed.
@@ -467,3 +462,5 @@ type ProducerBuilder interface {
 // other methods to provide additional functionality, e.g. configuration or
 // subscription registration.
 type Producer any
+=======
+>>>>>>> v2.1.0

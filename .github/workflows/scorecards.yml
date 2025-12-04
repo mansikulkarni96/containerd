@@ -27,7 +27,7 @@ jobs:
           persist-credentials: false
 
       - name: "Run analysis"
-        uses: ossf/scorecard-action@62b2cac7ed8198b15735ed49ab1e5cf35480ba46 # tag=v2.4.0
+        uses: ossf/scorecard-action@f49aabe0b5af0936a0987cfb85d86b75731b0186 # tag=v2.4.1
         with:
           results_file: results.sarif
           results_format: sarif
@@ -42,10 +42,14 @@ jobs:
       # format to the repository Actions tab.
       - name: "Upload artifact"
 <<<<<<< HEAD
+<<<<<<< HEAD
         uses: actions/upload-artifact@1eb3cb2b3e0f29609092a73eb033bb759a334595 # tag=v4.1.0
 =======
         uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # tag=v4.4.3
 >>>>>>> v2.0.7
+=======
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # tag=v4.6.2
+>>>>>>> v2.1.0
         with:
           name: SARIF file
           path: results.sarif
@@ -54,9 +58,13 @@ jobs:
       # Upload the results to GitHub's code scanning dashboard.
       - name: "Upload to code-scanning"
 <<<<<<< HEAD
+<<<<<<< HEAD
         uses: github/codeql-action/upload-sarif@03e7845b7bfcd5e7fb63d1ae8c61b0e791134fab # tag=v2.22.11
 =======
         uses: github/codeql-action/upload-sarif@662472033e021d55d94146f66f6058822b0b39fd # tag=v3.27.0
 >>>>>>> v2.0.7
+=======
+        uses: github/codeql-action/upload-sarif@60168efe1c415ce0f5521ea06d5c2062adbeed1b # tag=v3.28.17
+>>>>>>> v2.1.0
         with:
           sarif_file: results.sarif

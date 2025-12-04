@@ -111,10 +111,13 @@ guest:x:100:guest
 		},
 	}
 	for _, testCase := range testCases {
+<<<<<<< HEAD
 <<<<<<< HEAD:oci/spec_opts_linux_test.go
 		testCase := testCase
 =======
 >>>>>>> v2.0.7:pkg/oci/spec_opts_linux_test.go
+=======
+>>>>>>> v2.1.0
 		t.Run(testCase.user, func(t *testing.T) {
 			t.Parallel()
 			s := Spec{
@@ -172,7 +175,6 @@ guest:x:405:100:guest:/dev/null:/sbin/nologin
 		},
 	}
 	for _, testCase := range testCases {
-		testCase := testCase
 		t.Run(fmt.Sprintf("user %d", testCase.userID), func(t *testing.T) {
 			t.Parallel()
 			s := Spec{
@@ -232,7 +234,6 @@ guest:x:405:100:guest:/dev/null:/sbin/nologin
 		},
 	}
 	for _, testCase := range testCases {
-		testCase := testCase
 		t.Run(testCase.user, func(t *testing.T) {
 			t.Parallel()
 			s := Spec{
@@ -302,7 +303,6 @@ sys:x:3:root,bin,adm
 		},
 	}
 	for _, testCase := range testCases {
-		testCase := testCase
 		t.Run(testCase.user, func(t *testing.T) {
 			t.Parallel()
 			s := Spec{
@@ -706,7 +706,6 @@ daemon:x:2:root,bin,daemon
 	}
 
 	for _, testCase := range testCases {
-		testCase := testCase
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 			s := Spec{
@@ -764,7 +763,6 @@ func TestWithAppendAdditionalGroupsNoEtcGroup(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		testCase := testCase
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 			s := Spec{

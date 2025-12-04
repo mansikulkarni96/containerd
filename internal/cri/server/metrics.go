@@ -57,11 +57,15 @@ func init() {
 	)
 
 	// these CRI metrics record latencies for successful operations around a sandbox and container's lifecycle.
+<<<<<<< HEAD
 <<<<<<< HEAD:pkg/cri/sbserver/metrics.go
 	ns := metrics.NewNamespace(namespace, subsystem, nil)
 =======
 	ns := metrics.NewNamespace("containerd", "cri", nil)
 >>>>>>> v2.0.7:internal/cri/server/metrics.go
+=======
+	ns := metrics.NewNamespace("containerd", "cri", nil)
+>>>>>>> v2.1.0
 
 	sandboxListTimer = ns.NewTimer("sandbox_list", "time to list sandboxes")
 	sandboxCreateNetworkTimer = ns.NewTimer("sandbox_create_network", "time to create the network for a sandbox")

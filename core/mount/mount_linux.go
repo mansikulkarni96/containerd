@@ -65,7 +65,16 @@ func prepareIDMappedOverlay(usernsFd int, options []string) ([]string, func(), e
 		return options, nil, fmt.Errorf("failed to parse overlay lowerdir's from given options")
 	}
 
+<<<<<<< HEAD
 	tmpLowerdirs, idMapCleanUp, err := doPrepareIDMappedOverlay(tempMountLocation, lowerDirs, usernsFd)
+=======
+	tempRemountsLocation, err := os.MkdirTemp(tempMountLocation, "ovl-idmapped")
+	if err != nil {
+		return options, nil, fmt.Errorf("failed to create temporary overlay lowerdir mount location: %w", err)
+	}
+
+	tmpLowerdirs, idMapCleanUp, err := doPrepareIDMappedOverlay(tempRemountsLocation, lowerDirs, usernsFd)
+>>>>>>> v2.1.0
 	if err != nil {
 		return options, idMapCleanUp, fmt.Errorf("failed to create idmapped mount: %w", err)
 	}
@@ -360,6 +369,7 @@ func getUnprivilegedMountFlags(path string) (int, error) {
 	return flags, nil
 }
 
+<<<<<<< HEAD
 func doPrepareIDMappedOverlay(tmpDir string, lowerDirs []string, usernsFd int) (_ []string, _ func(), retErr error) {
 	commonDir, err := getCommonDirectory(lowerDirs)
 	if err != nil {
@@ -406,6 +416,39 @@ func doPrepareIDMappedOverlay(tmpDir string, lowerDirs []string, usernsFd int) (
 	cleanup := func() {
 		cleanMount()
 		cleanDir()
+=======
+func doPrepareIDMappedOverlay(tempRemountsLocation string, lowerDirs []string, usernsFd int) ([]string, func(), error) {
+	tmpLowerDirs := make([]string, 0, len(lowerDirs))
+
+	cleanUp := func() {
+		for _, lowerDir := range tmpLowerDirs {
+			if err := unix.Unmount(lowerDir, 0); err != nil {
+				log.L.WithError(err).Warnf("failed to unmount temp lowerdir %s", lowerDir)
+				continue
+			}
+			// Using os.Remove() so if it's not empty, we don't delete files in the
+			// rootfs.
+			if err := os.Remove(lowerDir); err != nil {
+				log.L.WithError(err).Warnf("failed to remove temporary overlay lowerdir")
+			}
+		}
+
+		// This dir should be empty now. Otherwise, we don't do anything.
+		if err := os.Remove(tempRemountsLocation); err != nil {
+			log.L.WithError(err).Infof("failed to remove temporary overlay dir")
+		}
+	}
+	for i, lowerDir := range lowerDirs {
+		tmpLowerDir := filepath.Join(tempRemountsLocation, strconv.Itoa(i))
+		tmpLowerDirs = append(tmpLowerDirs, tmpLowerDir)
+
+		if err := os.MkdirAll(tmpLowerDir, 0700); err != nil {
+			return nil, cleanUp, fmt.Errorf("failed to create temporary dir: %w", err)
+		}
+		if err := IDMapMountWithAttrs(lowerDir, tmpLowerDir, usernsFd, unix.MOUNT_ATTR_RDONLY, 0); err != nil {
+			return nil, cleanUp, err
+		}
+>>>>>>> v2.1.0
 	}
 	return tmpLowerDirs, cleanup, nil
 }

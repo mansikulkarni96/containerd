@@ -29,6 +29,7 @@ import (
 	"time"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	"github.com/containerd/containerd/cmd/ctr/commands"
 	"github.com/containerd/containerd/content"
 	"github.com/containerd/containerd/diff"
@@ -37,6 +38,14 @@ import (
 	"github.com/containerd/containerd/rootfs"
 	"github.com/containerd/containerd/snapshots"
 =======
+=======
+	"github.com/containerd/log"
+	digest "github.com/opencontainers/go-digest"
+	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"github.com/urfave/cli/v2"
+
+	containerd "github.com/containerd/containerd/v2/client"
+>>>>>>> v2.1.0
 	"github.com/containerd/containerd/v2/cmd/ctr/commands"
 	"github.com/containerd/containerd/v2/core/content"
 	"github.com/containerd/containerd/v2/core/diff"
@@ -44,11 +53,14 @@ import (
 	"github.com/containerd/containerd/v2/core/snapshots"
 	"github.com/containerd/containerd/v2/pkg/progress"
 	"github.com/containerd/containerd/v2/pkg/rootfs"
+<<<<<<< HEAD
 >>>>>>> v2.0.7
 	"github.com/containerd/log"
 	digest "github.com/opencontainers/go-digest"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/urfave/cli/v2"
+=======
+>>>>>>> v2.1.0
 )
 
 // Command is the cli command for managing snapshots
@@ -546,7 +558,12 @@ var unpackCommand = &cli.Command{
 	Name:      "unpack",
 	Usage:     "Unpack applies layers from a manifest to a snapshot",
 	ArgsUsage: "[flags] <digest>",
-	Flags:     commands.SnapshotterFlags,
+	Flags: append([]cli.Flag{
+		&cli.BoolFlag{
+			Name:  "sync-fs",
+			Usage: "Synchronize the underlying filesystem containing files when unpack images, false by default",
+		},
+	}, commands.SnapshotterFlags...),
 	Action: func(cliContext *cli.Context) error {
 		dgst, err := digest.Parse(cliContext.Args().First())
 		if err != nil {
@@ -567,7 +584,7 @@ var unpackCommand = &cli.Command{
 		for _, image := range images {
 			if image.Target().Digest == dgst {
 				fmt.Printf("unpacking %s (%s)...", dgst, image.Target().MediaType)
-				if err := image.Unpack(ctx, cliContext.String("snapshotter")); err != nil {
+				if err := image.Unpack(ctx, cliContext.String("snapshotter"), containerd.WithUnpackApplyOpts(diff.WithSyncFs(cliContext.Bool("sync-fs")))); err != nil {
 					fmt.Println()
 					return err
 				}

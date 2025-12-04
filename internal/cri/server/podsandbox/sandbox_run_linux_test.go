@@ -441,7 +441,6 @@ func TestLinuxSandboxContainerSpec(t *testing.T) {
 			},
 		},
 	} {
-		test := test
 		t.Run(test.desc, func(t *testing.T) {
 			c := newControllerService()
 			c.config.RootDir = t.TempDir()
@@ -735,7 +734,6 @@ options timeout:1
 			},
 		},
 	} {
-		test := test
 		t.Run(test.desc, func(t *testing.T) {
 			c := newControllerService()
 			c.os.(*ostesting.FakeOS).HostnameFn = func() (string, error) {
@@ -809,7 +807,6 @@ options timeout:1
 `,
 		},
 	} {
-		test := test
 		t.Run(test.desc, func(t *testing.T) {
 			resolvContent, err := parseDNSOptions(test.servers, test.searches, test.options)
 			if test.expectErr {

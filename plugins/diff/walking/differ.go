@@ -25,14 +25,19 @@ import (
 	"io"
 	"time"
 
+<<<<<<< HEAD
 <<<<<<< HEAD:diff/walking/differ.go
 =======
 	"github.com/containerd/errdefs"
 >>>>>>> v2.0.7:plugins/diff/walking/differ.go
+=======
+	"github.com/containerd/errdefs"
+>>>>>>> v2.1.0
 	"github.com/containerd/log"
 	digest "github.com/opencontainers/go-digest"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
+<<<<<<< HEAD
 <<<<<<< HEAD:diff/walking/differ.go
 	"github.com/containerd/containerd/archive"
 	"github.com/containerd/containerd/archive/compression"
@@ -43,6 +48,8 @@ import (
 	"github.com/containerd/containerd/mount"
 	"github.com/containerd/containerd/pkg/epoch"
 =======
+=======
+>>>>>>> v2.1.0
 	"github.com/containerd/containerd/v2/core/content"
 	"github.com/containerd/containerd/v2/core/diff"
 	"github.com/containerd/containerd/v2/core/mount"
@@ -50,7 +57,10 @@ import (
 	"github.com/containerd/containerd/v2/pkg/archive/compression"
 	"github.com/containerd/containerd/v2/pkg/epoch"
 	"github.com/containerd/containerd/v2/pkg/labels"
+<<<<<<< HEAD
 >>>>>>> v2.0.7:plugins/diff/walking/differ.go
+=======
+>>>>>>> v2.1.0
 )
 
 type walkingDiff struct {

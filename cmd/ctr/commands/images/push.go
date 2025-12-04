@@ -20,7 +20,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/http/httptrace"
 	"os"
 	"sync"
 	"text/tabwriter"
@@ -47,6 +46,7 @@ import (
 	"github.com/containerd/containerd/v2/core/transfer"
 	"github.com/containerd/containerd/v2/core/transfer/image"
 	"github.com/containerd/containerd/v2/core/transfer/registry"
+	"github.com/containerd/containerd/v2/pkg/httpdbg"
 	"github.com/containerd/containerd/v2/pkg/progress"
 >>>>>>> v2.0.7
 	"github.com/containerd/log"
@@ -189,7 +189,7 @@ var pushCommand = &cli.Command{
 		}
 
 		if cliContext.Bool("http-trace") {
-			ctx = httptrace.WithClientTrace(ctx, commands.NewDebugClientTrace(ctx))
+			ctx = httpdbg.WithClientTrace(ctx)
 		}
 		resolver, err := commands.GetResolver(ctx, cliContext)
 		if err != nil {
